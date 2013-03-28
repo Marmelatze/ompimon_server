@@ -10,7 +10,7 @@
     "less-middleware": "0.1.9",
     "consolidate": "0.8.0",
     "swig": "0.13.5",
-    "orm": "2.0.6",
-    "mysql": "*"
+    "jugglingdb": "latest",
+    "jugglingdb-redis": "latest"
   }
 }
