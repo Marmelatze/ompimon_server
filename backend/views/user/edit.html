@@ -1,11 +1,11 @@
 {% extends "index.html" %}
 
 {% block content %}
-    <form action="/users/add" method="post" class="form-horizontal well">
+    <form action="/users/{% if user.id %}{{ user.id }}/edit{% else %}add{% endif %}" method="post" class="form-horizontal well">
         <div class="control-group">
             <label class="control-label" for="name">Name:</label>
             <div class="controls">
-                <input type="text" id="name" name="name" value="{{ name }}">
+                <input type="text" id="name" name="name" value="{{ user.name }}">
             </div>
         </div>
         <div class="control-group">
@@ -19,8 +19,8 @@
             <label class="control-label" for="type">Type:</label>
             <div class="controls">
                 <select name="type" id="type">
-                    <option value="cluster" {% if type == "cluster" %} selected="selected"{% endif %}>Cluster User</option>
-                    <option value="android" {% if type == "android" %} selected="selected"{% endif %}>Android User</option>
+                    <option value="cluster" {% if user.type == "cluster" %} selected="selected"{% endif %}>Cluster User</option>
+                    <option value="android" {% if user.type == "android" %} selected="selected"{% endif %}>Android User</option>
                 </select>
             </div>
         </div>

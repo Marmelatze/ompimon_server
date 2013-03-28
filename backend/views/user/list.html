@@ -24,8 +24,8 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="/users/edit/{{ user.id }}" class="btn btn-mini"><i class="icon-pencil"></i> edit</a>
-                        <a href="/users/edit/{{ user.id }}/delete" class="btn btn-mini btn-danger"><i class="icon-trash icon-white"></i> delete</a>
+                        <a href="/users/{{ user.id }}/edit" class="btn btn-mini"><i class="icon-pencil"></i> edit</a>
+                        <a href="/users/{{ user.id }}/delete" class="btn btn-mini btn-danger"><i class="icon-trash icon-white"></i> delete</a>
                     </td>
                 </tr>
             {% endfor %}
