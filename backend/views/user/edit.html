@@ -1,6 +1,12 @@
 {% extends "index.html" %}
 
 {% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">Home</a> <span class="divider">/</span></li>
+        <li><a href="/users">Users</a> <span class="divider">/</span></li>
+        <li class="active">{% if user.id %}edit{% else %}add{% endif %}</li>
+    </ul>
+
     <form action="/users/{% if user.id %}{{ user.id }}/edit{% else %}add{% endif %}" method="post" class="form-horizontal well">
         <div class="control-group">
             <label class="control-label" for="name">Name:</label>
