@@ -3,8 +3,32 @@
 {% block content %}
     <a href="/users/add" class="btn btn-primary"><i class="icon-plus icon-white"></i> Add User</a>
     <table class="table">
-        {% for user in users %}
-
-        {% endfor %}
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Password</th>
+                <th>Type</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.password }}</td>
+                    <td>
+                        {% if user.type == "cluster" %}
+                            <span class="label label-success">Cluster</span>
+                        {% else %}
+                            <span class="label label-warning">Android</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/users/edit/{{ user.id }}" class="btn btn-mini"><i class="icon-pencil"></i> edit</a>
+                        <a href="/users/edit/{{ user.id }}/delete" class="btn btn-mini btn-danger"><i class="icon-trash icon-white"></i> delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
 {% endblock %}

@@ -14,6 +14,23 @@ var express = require('express'),
 
 var app = express();
 
+// set up db
+var db = config.db;
+orm.connect("mysql://" + db.user + ":" + db.password + "@" + db.host + ":" + db.port + "/" + db.name, function (err, db) {
+    console.log("connected to db");
+});
+
+app.use(orm.express("mysql://" + db.user + ":" + db.password + "@" + db.host + ":" + db.port + "/" + db.name, {
+    define: function (db, models) {
+        db.load("./models", function (err) {
+            models.user = db.models.user;
+        });
+        console.log("Synchronizing database schema");
+        db.sync();
+    }
+}));
+
+
 app.configure(function () {
     app.set('port', process.env.PORT || 3000);
     app.set('views', __dirname + '/views');
@@ -40,23 +57,7 @@ swig.init({
 });
 
 
-// set up db
-var db = config.db;
-orm.connect("mysql://" + db.user + ":" + db.password + "@" + db.host + ":" + db.port + "/" + db.name, function (err, db) {
-    console.log("connected to db");
-});
 
-/*
-app.use(orm.express("mysql://" + db.user + ":" + db.password + "@" + db.host + ":" + db.port + "/" + db.name, {
-    define: function (db, models) {
-        db.load("./models", function (err) {
-            var User = db.models.user;
-        });
-        console.log("Synchronizing database schema");
-        db.sync();
-    }
-}));
-*/
 
 app.get('/', routes.index);
 app.get('/users', user.list);
