@@ -2,27 +2,26 @@
  * GET users listing.
  */
 
+var crypto = require("crypto");
+
 exports.list = function (req, res) {
-    req.models.user.find({}, function(err, users) {
-
-
+    req.models.user.all(function(err, users) {
         res.render('user/list', {users: users});
     });
-
 };
 
 exports.add = function (req, res) {
     if ("POST" == req.method) {
-        req.models.user.create([{
+        req.models.user.create({
+            salt: generateSalt(),
             name: req.body.name,
-            password: req.body.password,
+            password: generatePassword(this.salt, req.body.password),
             type: req.body.type
-        }], function(err, items) {
-            if (!err) {
-            }
         });
 
-        return res.redirect("/users");
+        res.redirect("/users");
+
+        return;
     }
     res.render("user/edit", {
         user: {}
@@ -31,7 +30,7 @@ exports.add = function (req, res) {
 
 exports.load = function (req, res, next) {
     if (req.params.user) {
-        req.models.user.get(req.params.user, function(err, user) {
+        req.models.user.find(req.params.user, function(err, user) {
             req.user = user;
             next();
         });
@@ -40,17 +39,19 @@ exports.load = function (req, res, next) {
 
 exports.edit = function (req, res) {
     if ("POST" == req.method) {
-        req.user.name = req.body.name;
+        var user = req.user;
+        user.name = req.body.name;
         if (req.body.password.length > 0) {
-            req.user.password = req.body.password;
+            user.salt = generateSalt();
+            user.password = generatePassword(user.salt, req.body.password);
         }
-        req.user.type = req.body.type;
+        user.type = req.body.type;
 
-        req.user.save(function(err) {
-
+        user.save(function(err) {
+            res.redirect("/users");
         });
 
-        return res.redirect("/users");
+        return;
     }
     res.render("user/edit", {
         user: req.user
@@ -58,7 +59,16 @@ exports.edit = function (req, res) {
 };
 
 exports.delete = function(req, res) {
-    req.user.remove();
+    req.user.destroy();
 
     res.redirect("/users");
 };
+
+var generatePassword = exports.generatePassword = function(salt, password) {
+    return crypto.createHash('sha512').update(crypto.createHash('sha512').update(password + salt).digest('hex') + salt).digest('hex');
+};
+
+
+function generateSalt() {
+    return crypto.randomBytes(256);
+}

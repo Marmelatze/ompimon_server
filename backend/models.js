@@ -1,9 +1,8 @@
-module.exports = function (db, cb) {
-    db.define('user', {
-        name : String,
+module.exports = function(schema) {
+    var user = schema.define('user', {
+        name: String,
         password: String,
-        type: ['cluster', 'android']
+        salt: String,
+        type: String
     });
-
-    return cb();
 };

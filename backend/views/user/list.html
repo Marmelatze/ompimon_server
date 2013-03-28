@@ -6,7 +6,6 @@
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Password</th>
                 <th>Type</th>
                 <th>Options</th>
             </tr>
@@ -15,7 +14,6 @@
             {% for user in users %}
                 <tr>
                     <td>{{ user.name }}</td>
-                    <td>{{ user.password }}</td>
                     <td>
                         {% if user.type == "cluster" %}
                             <span class="label label-success">Cluster</span>
