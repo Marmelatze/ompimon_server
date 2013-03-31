@@ -9,8 +9,7 @@ var express = require('express'),
     user = require('./routes/user'),
     http = require('http'),
     path = require('path'),
-    Schema = require("jugglingdb").Schema,
-    config = require("./config").config;
+    Schema = require("jugglingdb").Schema;
 
 var app = express();
 
