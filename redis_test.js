@@ -14,16 +14,26 @@ startServer();
 function startServer() {
     var port = 8215;
     var server = net.createServer(function (c) { //'connection' listener
-        console.log('server connected');
+        console.log('server connected ');
 
-        c.on('end', function () {
+        c.on('close', function () {
             console.log('server disconnected');
         });
 
-        client.set("test","Das ist ein Teststring");
+        c.on('data', function(data){
+            console.log('receive: ');
+            console.log('data as buffer: ',data);
+            data = data.toString('utf-8').trim();
+            console.log('data as string: ', data);
+            if(data == 'close'){
+                server.close();
+            }
+        });
+
+        /*client.set("test","Das ist ein Teststring");
         client.get("test", function(err, reply){
             c.write(reply);
-        });
+        });*/
 
     });
 
