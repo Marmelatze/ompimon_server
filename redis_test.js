@@ -22,12 +22,10 @@ function startServer() {
 
         c.on('data', function(data){
             console.log('receive: ');
-            console.log('data as buffer: ',data);
+            //console.log('data as buffer: ',data);
             data = data.toString('utf-8').trim();
             console.log('data as string: ', data);
-            if(data == 'close'){
-                server.close();
-            }
+            client.lpush("testlist",data);
         });
 
         /*client.set("test","Das ist ein Teststring");
