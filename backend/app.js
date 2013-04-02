@@ -61,6 +61,7 @@ app.get('/users', user.list);
 app.all('/users/add', user.add);
 app.all('/users/:user/edit', user.load, user.edit);
 app.get('/users/:user/delete', user.load, user.delete);
+app.get('/auth/:user/:password', user.authenticate);
 
 http.createServer(app).listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));

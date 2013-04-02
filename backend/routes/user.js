@@ -46,9 +46,17 @@ exports.edit = function (req, res) {
             user.password = generatePassword(user.salt, req.body.password);
         }
         user.type = req.body.type;
-
-        user.save(function(err) {
-            res.redirect("/users");
+        user.isValid(function(valid) {
+            if (valid) {
+                user.save(function(err) {
+                    res.redirect("/users");
+                });
+            } else {
+                res.render("user/edit", {
+                    user: req.user,
+                    errors: user.errors
+                });
+            }
         });
 
         return;
@@ -64,8 +72,29 @@ exports.delete = function(req, res) {
     res.redirect("/users");
 };
 
+exports.authenticate = function(req, res) {
+    var username = req.params.user;
+    var password = req.params.password;
+
+    req.models.user.findOne({where: {name: username}}, function(err, user) {
+        if (!user) {
+            res.send(401);
+
+            return;
+        }
+
+        if (user.password == generatePassword(user.salt, password)) {
+            res.send(200);
+
+            return;
+        }
+
+        res.send(401);
+    });
+};
+
 var generatePassword = exports.generatePassword = function(salt, password) {
-    return crypto.createHash('sha512').update(crypto.createHash('sha512').update(password + salt).digest('hex') + salt).digest('hex');
+    return crypto.createHash('sha512').update(crypto.createHash('sha512').update(password).digest('hex') + salt).digest('hex');
 };
 
 
