@@ -16,23 +16,15 @@ function startServer() {
     var server = net.createServer(function (c) { //'connection' listener
         console.log('server connected ');
 
-        c.on('close', function () {
-            console.log('server disconnected');
-        });
-
         c.on('data', function(data){
-            console.log('receive: ');
-            //console.log('data as buffer: ',data);
             data = data.toString('utf-8').trim();
-            console.log('data as string: ', data);
+            console.log('receive: ',data);
             client.lpush("testlist",data);
         });
 
-        /*client.set("test","Das ist ein Teststring");
-        client.get("test", function(err, reply){
-            c.write(reply);
-        });*/
-
+        c.on('close', function () {
+            console.log('server disconnected');
+        });
     });
 
 
