@@ -4,12 +4,22 @@
 
 var crypto = require("crypto");
 
+/**
+ * List all users
+ * @param req
+ * @param res
+ */
 exports.list = function (req, res) {
     req.models.user.all(function(err, users) {
         res.render('user/list', {users: users});
     });
 };
 
+/**
+ * Create new users
+ * @param req
+ * @param res
+ */
 exports.add = function (req, res) {
     if ("POST" == req.method) {
         req.models.user.create({
@@ -28,6 +38,12 @@ exports.add = function (req, res) {
     });
 };
 
+/**
+ * middleware for loading users
+ * @param req
+ * @param res
+ * @param next
+ */
 exports.load = function (req, res, next) {
     if (req.params.user) {
         req.models.user.find(req.params.user, function(err, user) {
@@ -37,6 +53,11 @@ exports.load = function (req, res, next) {
     }
 };
 
+/**
+ * edit users
+ * @param req
+ * @param res
+ */
 exports.edit = function (req, res) {
     if ("POST" == req.method) {
         var user = req.user;
@@ -66,12 +87,23 @@ exports.edit = function (req, res) {
     });
 };
 
+/**
+ * delete users
+ * @param req
+ * @param res
+ */
 exports.delete = function(req, res) {
     req.user.destroy();
 
     res.redirect("/users");
 };
 
+/**
+ * Authenticate api
+ * Returns HTTP Status 200 if successfull or 401 if failed
+ * @param req
+ * @param res
+ */
 exports.authenticate = function(req, res) {
     var username = req.params.user;
     var password = req.params.password;
