@@ -25,8 +25,6 @@ Auth.prototype.parse = function(client, buf, callback) {
         .vars
     ;
 
-    throw new Error("foo");
-
     this.authenticate(client, vars.username, vars.password, callback);
 };
 

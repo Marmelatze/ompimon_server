@@ -5,9 +5,9 @@ var _ = require("underscore")._,
 
 var actions = {
     0x00: 'auth',
-/*    0x01: 'init',
-    0x02: 'send',
-    0xFF: 'finalize'*/
+    0x01: 'init',
+//    0x02: 'send',
+    0xFF: 'finalize'
 };
 
 var actionMap = {};
