@@ -5,38 +5,41 @@
  *
  */
 var net = require('net');
+var BufferBuilder = require('buffer-builder');
+var program = require('commander');
+
 var client = net.connect({port: 8214}, function() { //'connect' listener
-        console.log('client connected');
+    //var username = 'test';
+    //var password = 'install';
+    console.log('client connected');
 
-        auth();
+    program.prompt('Enter username: ', function(username){
+        console.log('Your username is %s', username);
 
-        /*buf = new Buffer(9);
-        len = buf.write('1 + 2 = 3', 0);
-        console.log(len + " bytes: " + buf.toString('utf8', 0, len));
-        client.write(buf);*/
+        program.password('Enter password: ', '*', function(password){
+            process.stdin.destroy();
+            auth(username, password);
+        });
+
     });
+});
+
 client.on('data', function(data) {
     console.log(data.toString('utf8'));
-    client.end();
 });
 client.on('end', function() {
     console.log('client disconnected');
+
 });
 
-function auth(){
-    var username = 'test';
-    var password = 'install';
-    var buf = new Buffer(256);
-    var len = 0;
-    buf.writeUInt8('0', 0);
-    len++;
-    buf.writeUInt8(username.length, len);
-    len++;
-    len += buf.write(username, len);
-    buf.writeUInt8(password.length, len);
-    len++;
-    len += buf.write(password, len);
+function auth(username, password){
 
-    finBuf = buf.slice(0,len);
-    client.write(finBuf);
+    var auth = new BufferBuilder();
+    auth.appendUInt8(0);
+    auth.appendUInt8(username.length);
+    auth.appendString(username);
+    auth.appendUInt8(password.length);
+    auth.appendString(password);
+
+    client.write(auth.get());
 }
