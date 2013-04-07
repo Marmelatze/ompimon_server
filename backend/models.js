@@ -3,8 +3,16 @@ module.exports = function(schema) {
         name: {type: String, index: true},
         password: String,
         salt: String,
-        type: String
+        types: String
     });
+
+    user.prototype.getTypes = function() {
+        return this.types.split(",");
+    };
+    user.prototype.setTypes = function(types) {
+        this.types = 
+    }
+
     user.validatesPresenceOf('name', 'type');
     user.validatesInclusionOf('type', {in: ['cluster', 'android']});
 
