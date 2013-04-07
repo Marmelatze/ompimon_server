@@ -4,10 +4,10 @@
  * Time: 09:28
  *
  */
-var net = require('net');
-var BufferBuilder = require('buffer-builder');
-var binary = require('binary');
-var program = require('commander');
+var net = require('net'),
+    BufferBuilder = require('buffer-builder'),
+    binary = require('binary'),
+    program = require('commander');
 
 var client = net.connect({port: 8214}, function() {
     console.log('client connected');
