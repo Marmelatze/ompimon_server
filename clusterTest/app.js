@@ -25,6 +25,8 @@ var client = net.connect({port: 8214}, function() { //'connect' listener
 });
 
 client.on('data', function(data) {
+    console.log("received:");
+    console.log(data);
     console.log(data.toString('utf8'));
 });
 client.on('end', function() {

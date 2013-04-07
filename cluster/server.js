@@ -1,7 +1,14 @@
 var cluster = require('cluster');
-var numCPUs = require('os').cpus().length * 2;
+var numCPUs = require('os').cpus().length;
+numCPUs = 1;
 
 var worker = require("./worker");
+
+if (numCPUs <= 1) {
+    new worker.worker(8214);
+
+    return;
+}
 
 if (cluster.isMaster) {
     // Fork workers.
