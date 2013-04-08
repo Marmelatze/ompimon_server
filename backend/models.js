@@ -3,18 +3,11 @@ module.exports = function(schema) {
         name: {type: String, index: true},
         password: String,
         salt: String,
-        types: String
+        types: Array
     });
 
-    user.prototype.getTypes = function() {
-        return this.types.split(",");
-    };
-    user.prototype.setTypes = function(types) {
-        this.types = 
-    }
 
-    user.validatesPresenceOf('name', 'type');
-    user.validatesInclusionOf('type', {in: ['cluster', 'android']});
+    user.validatesPresenceOf('name', 'types');
 
     user.validatesUniquenessOf('name', {message: 'name is not unique'});
 
