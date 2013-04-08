@@ -1,0 +1,8 @@
+{
+    "name": "swp-cluster-test",
+    "version": "0.0.1",
+    "dependencies": {
+        "buffer-builder": "*",
+        "binary": "*"
+    }
+}
