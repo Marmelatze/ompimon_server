@@ -1,4 +1,5 @@
 var protocol = require("../protocol"),
+    Int64 = require('node-int64'),
     BufferBuilder = require("buffer-builder"),
     binary = require("binary"),
     Client = require("../client.js")
@@ -70,14 +71,13 @@ function buildBinary(data) {
     buffer.appendUInt8(0x02); // action id
     buffer.appendUInt8(data.lists.length); // list count
     data.lists.forEach(function(list) {
-        buffer.appendUInt8(list.sender); // sender id
+        buffer.appendUInt32BE(list.sender); // sender id
+        buffer.appendUInt32BE(list.receivers.length); // receivers
         list.receivers.forEach(function(receiver) {
-            buffer.appendUInt8(receiver.id); // receiver id
-            var messages = new Buffer(64);
-            messages.writeUInt32LE(0x00, 0);
-            messages.writeUInt32LE(receiver.messages, 32);
-            console.log(messages);
-            buffer.appendBuffer(messages);
+            buffer.appendUInt32BE(receiver.id); // receiver id
+            var messages = new Int64(receiver.messages);
+            buffer.appendBuffer(messages.buffer);
+            buffer.appendBuffer((new Int64(receiver.data)).buffer);
         });
     });
 
