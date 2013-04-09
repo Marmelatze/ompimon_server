@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app"
+    "start": "node server.js",
+    "test": "nodeunit test"
   },
   "dependencies": {
     "buffer-builder": "*",
-    "binary": "*",
-    "bitsyntax": "*"
+    "binary": "*"
   }
 }
