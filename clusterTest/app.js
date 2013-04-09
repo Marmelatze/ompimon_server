@@ -7,7 +7,8 @@
 var net = require('net'),
     BufferBuilder = require('buffer-builder'),
     binary = require('binary'),
-    program = require('commander');
+    program = require('commander'),
+    protocol = require('./protocol');
 
 var client = net.connect({port: 8214}, function() {
     console.log('client connected');
@@ -17,12 +18,8 @@ var client = net.connect({port: 8214}, function() {
 
 client.on('data', function(data) {
     console.log("received:", data);
-    console.log(data.toString('utf8'));
-
-    var parseData = binary.parse(data).word8lu('type').vars;
-
-    console.dir(parseData);
-
+    //console.log(data.toString('utf8'));
+    protocol.parse(data);
 });
 client.on('end', function() {
     console.log('client disconnected');

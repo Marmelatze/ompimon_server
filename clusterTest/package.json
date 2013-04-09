@@ -4,6 +4,7 @@
     "dependencies": {
         "buffer-builder": "*",
         "binary": "*",
-        "commander": "*"
+        "commander": "*",
+        "underscore": "*"
     }
 }
