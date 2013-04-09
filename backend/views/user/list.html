@@ -20,9 +20,10 @@
                 <tr>
                     <td>{{ user.name }}</td>
                     <td>
-                        {% if user.type == "cluster" %}
+                        {% if "cluster" in user.types %}
                             <span class="label label-success">Cluster</span>
-                        {% else %}
+                        {% endif %}
+                        {% if "android" in user.types %}
                             <span class="label label-warning">Android</span>
                         {% endif %}
                     </td>

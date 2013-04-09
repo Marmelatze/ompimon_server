@@ -26,7 +26,7 @@ exports.add = function (req, res) {
             salt: generateSalt(),
             name: req.body.name,
             password: generatePassword(this.salt, req.body.password),
-            type: req.body.type
+            types: req.body.types
         });
 
         res.redirect("/users");
@@ -66,7 +66,7 @@ exports.edit = function (req, res) {
             user.salt = generateSalt();
             user.password = generatePassword(user.salt, req.body.password);
         }
-        user.type = req.body.type;
+        user.types = req.body.types;
         user.isValid(function(valid) {
             if (valid) {
                 user.save(function(err) {

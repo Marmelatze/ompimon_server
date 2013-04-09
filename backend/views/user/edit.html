@@ -37,10 +37,17 @@
         <div class="control-group">
             <label class="control-label" for="type">Type:</label>
             <div class="controls">
-                <select name="type" id="type">
-                    <option value="cluster" {% if user.type == "cluster" %} selected="selected"{% endif %}>Cluster User</option>
-                    <option value="android" {% if user.type == "android" %} selected="selected"{% endif %}>Android User</option>
-                </select>
+                <label class="checkbox">
+                    <input type="checkbox" name="types[]" value="cluster"
+                            {% if "cluster" in user.types %} checked="checked"{% endif %} />
+                    Cluster User
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox" name="types[]" value="android"
+                            {% if "clsuter" in user.types %} checked="checked"{% endif %} />
+                    Android User
+                </label>
+
             </div>
         </div>
         <div class="control-group">

@@ -3,10 +3,11 @@ module.exports = function(schema) {
         name: {type: String, index: true},
         password: String,
         salt: String,
-        type: String
+        types: Array
     });
-    user.validatesPresenceOf('name', 'type');
-    user.validatesInclusionOf('type', {in: ['cluster', 'android']});
+
+
+    user.validatesPresenceOf('name', 'types');
 
     user.validatesUniquenessOf('name', {message: 'name is not unique'});
 
