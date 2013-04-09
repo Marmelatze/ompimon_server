@@ -23,10 +23,12 @@ exports.testAuthSuccess = function(test) {
 
     protocol.parse(client, buffer.get(), function(result) {
         var vars = binary.parse(result)
+            .word8('actionId')
             .word8('result')
             .buffer('id', 32)
             .vars
         ;
+        test.equal(vars.actionId, 0x00);
         test.equal(vars.result, 0);
         test.equal(vars.id.toString('utf8'), client.id);
         test.done();
@@ -46,9 +48,11 @@ exports.testAuthFailure = function(test) {
 
     protocol.parse(client, buffer.get(), function(result) {
         var vars = binary.parse(result)
+            .word8('actionId')
             .word8('result')
             .vars
         ;
+        test.equal(vars.actionId, 0x00);
         test.equal(vars.result, 1);
         test.done();
     });

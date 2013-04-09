@@ -43,6 +43,7 @@ Auth.prototype.authenticate = function(client, username, password, callback) {
 Auth.prototype.sendSuccess = function(client) {
 
     var result = new BufferBuilder();
+    result.appendUInt8(0x00); // action id
     result.appendUInt8(0);
     result.appendString(client.id);
 
@@ -52,6 +53,7 @@ Auth.prototype.sendSuccess = function(client) {
 Auth.prototype.sendFailed = function(client) {
 
     var result = new BufferBuilder();
+    result.appendUInt8(0x00);
     result.appendUInt8(1);
 
     return result.get();
