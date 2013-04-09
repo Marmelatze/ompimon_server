@@ -28,6 +28,7 @@ exports.parse = function(client, buf, callback) {
     var actionClass = actionMap[action];
     if (!actionClass) {
         result = new BufferBuilder();
+        result.appendUInt8(action);
         result.appendUInt8(0x02); // invalid input
         callback(result.get());
 
@@ -36,6 +37,7 @@ exports.parse = function(client, buf, callback) {
 
     if (!client.authenticated && actionClass.needAuthentication) {
         result = new BufferBuilder();
+        result.appendUInt8(action);
         result.appendUInt8(0x03); // not authenticated
         callback(result.get());
 
