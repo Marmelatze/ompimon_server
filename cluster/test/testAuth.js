@@ -2,6 +2,7 @@ var protocol = require("../protocol"),
     auth = require("../auth").auth,
     BufferBuilder = require("buffer-builder"),
     binary = require("binary"),
+    protoAuth = require('../protocol/actions/auth')
     client = require("../client.js");
 
 auth.type = "test"; // make authentication testable
@@ -9,8 +10,28 @@ auth.type = "test"; // make authentication testable
 var client = new client.client(new Buffer(256));
 client.id = "1234567890yyyasdfasdfasdfasdfasd";
 
-// test successfull auth
+var action = new protoAuth.Action;
 
+// test parsing
+exports.testParse = function(test) {
+    var buffer = new BufferBuilder();
+    var username = "test";
+    var password = "test";
+    buffer.appendUInt8(username.length);
+    buffer.appendString(username);
+    buffer.appendUInt8(password.length);
+    buffer.appendString(password);
+
+    var result = action.parse(buffer.get());
+    test.deepEqual(result, {
+        username: 'test',
+        password: 'test'
+    });
+    test.done();
+}
+
+
+// test successfull auth
 exports.testAuthSuccess = function(test) {
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x00);

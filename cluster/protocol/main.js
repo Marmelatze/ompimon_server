@@ -44,5 +44,6 @@ exports.parse = function(client, buf, callback) {
         return;
     }
 
-    actionClass.parse(client, buf.slice(1, buf.length), callback);
+    var result = actionClass.parse(buf.slice(1, buf.length));
+    actionClass.process(client, result, callback);
 };

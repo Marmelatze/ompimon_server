@@ -16,9 +16,8 @@ function Send() {
 Send.super_ = action;
 Send.prototype = Object.create(action.prototype);
 
-Send.prototype.parse = function(client, buf, callback) {
+Send.prototype.parse = function(buf) {
     var offset = 0;
-    console.log(buf);
     var listCount = buf.readUInt8(offset++);
     var lists = [];
 
@@ -32,7 +31,6 @@ Send.prototype.parse = function(client, buf, callback) {
         offset += 4;
         var receiverCount = buf.readUInt32BE(offset);
         offset += 4;
-        console.log(receiverCount);
         for (var j = 0; j < receiverCount; j++) {
             var receiver = {
                 id: null,
@@ -42,17 +40,30 @@ Send.prototype.parse = function(client, buf, callback) {
             process.receivers.push(receiver);
             receiver.id = buf.readUInt32BE(offset);
             offset += 4;
-            receiver.messages = new Int64(buf.slice(offset, offset + 8)).toString();
+            receiver.messages = new Int64(buf.slice(offset, offset + 8)).toOctetString();
             offset += 8;
-            receiver.data = new Int64(buf.slice(offset, offset+8)).toString();
+            receiver.data = new Int64(buf.slice(offset, offset+8)).toOctetString();
             offset += 8;
         }
     }
 
+    //console.log(JSON.stringify(lists, null, 2));
 
-    console.log(JSON.stringify(lists, null, 2));
+    return {
+        lists: lists
+    };
+};
 
-
-
+Int64.prototype.toString = function() {
 
 };
+
+
+Send.prototype.process = function(client, result, callback) {
+    //@TODO Implement
+
+    var buffer = new BufferBuilder();
+    buffer.appendUInt8(0x02);
+    buffer.appendUInt8(0x00);
+    callback(buffer.get());
+}
