@@ -24,5 +24,6 @@ Init.prototype.parse = function(client, buf, callback) {
         .vars
     ;
     console.log(vars);
+    //TODO: save to redis
 
 };

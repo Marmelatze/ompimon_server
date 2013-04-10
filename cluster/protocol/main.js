@@ -6,7 +6,7 @@ var _ = require("underscore")._,
 var actions = {
     0x00: 'auth',
     0x01: 'init',
-//    0x02: 'send',
+    0x02: 'send',
     0xFF: 'finalize'
 };
 
@@ -28,6 +28,7 @@ exports.parse = function(client, buf, callback) {
     var actionClass = actionMap[action];
     if (!actionClass) {
         result = new BufferBuilder();
+        result.appendUInt8(action);
         result.appendUInt8(0x02); // invalid input
         callback(result.get());
 
@@ -36,11 +37,13 @@ exports.parse = function(client, buf, callback) {
 
     if (!client.authenticated && actionClass.needAuthentication) {
         result = new BufferBuilder();
+        result.appendUInt8(action);
         result.appendUInt8(0x03); // not authenticated
         callback(result.get());
 
         return;
     }
 
-    actionClass.parse(client, buf.slice(1, buf.length), callback);
+    var result = actionClass.parse(buf.slice(1, buf.length));
+    actionClass.process(client, result, callback);
 };

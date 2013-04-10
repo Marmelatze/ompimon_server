@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "buffer-builder": "*",
-    "binary": "*"
+    "binary": "*",
+    "node-int64": "*"
   }
 }

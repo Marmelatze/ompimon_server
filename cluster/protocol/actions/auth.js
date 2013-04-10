@@ -15,7 +15,7 @@ function Auth() {
 Auth.super_ = action;
 Auth.prototype = Object.create(action.prototype);
 
-Auth.prototype.parse = function(client, buf, callback) {
+Auth.prototype.parse = function(buf) {
     var pointer = 1;
     var vars = binary.parse(buf)
         .word8('userLength')
@@ -25,7 +25,14 @@ Auth.prototype.parse = function(client, buf, callback) {
         .vars
     ;
 
-    this.authenticate(client, vars.username, vars.password, callback);
+    return {
+        username: vars.username.toString(),
+        password: vars.password.toString()
+    };
+};
+
+Auth.prototype.process = function(client, result, callback) {
+    this.authenticate(client, result.username, result.password, callback);
 };
 
 Auth.prototype.authenticate = function(client, username, password, callback) {
@@ -43,6 +50,7 @@ Auth.prototype.authenticate = function(client, username, password, callback) {
 Auth.prototype.sendSuccess = function(client) {
 
     var result = new BufferBuilder();
+    result.appendUInt8(0x00); // action id
     result.appendUInt8(0);
     result.appendString(client.id);
 
@@ -52,6 +60,7 @@ Auth.prototype.sendSuccess = function(client) {
 Auth.prototype.sendFailed = function(client) {
 
     var result = new BufferBuilder();
+    result.appendUInt8(0x00);
     result.appendUInt8(1);
 
     return result.get();
