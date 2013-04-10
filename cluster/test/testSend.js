@@ -56,6 +56,19 @@ exports.testParse = function(test) {
     test.done();
 };
 
+exports.testProcess = function(test) {
+    action.process(client, data, function(result) {
+        var vars = binary.parse(result)
+            .word8('actionId')
+            .word8('result')
+            .vars
+        ;
+        test.equal(vars.actionId, 0x02);
+        test.equal(vars.result, 0);
+        test.done();
+    });
+}
+
 /**
  * Build binary to send to server
  * @param data
@@ -76,5 +89,5 @@ function buildBinary(data) {
     });
 
     return buffer.get();
-
 }
+
