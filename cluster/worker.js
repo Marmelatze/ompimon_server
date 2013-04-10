@@ -56,7 +56,7 @@ Worker.prototype.connect = function(client) {
         client.id = crypto.createHash('md5').update(crypto.randomBytes(512)).digest('hex');
     }
     console.log("client "+ client.id+" connected");
-    client.socket.write("Welcome!\r\n");
+    // client.socket.write("Welcome!\r\n"); // lukas wollte es so!
     client.socket.on('data', function(data) {
         self.process(client, data);
     });
