@@ -2,7 +2,8 @@
  * GET users listing.
  */
 
-var crypto = require("crypto");
+var crypto = require("crypto"),
+    _ = require('underscore');
 
 /**
  * List all users
@@ -11,6 +12,8 @@ var crypto = require("crypto");
  */
 exports.list = function (req, res) {
     req.models.user.all(function(err, users) {
+        console.log(_.indexOf(users[0]['types'], 'cluster'));
+
         res.render('user/list', {users: users});
     });
 };
@@ -105,23 +108,31 @@ exports.delete = function(req, res) {
  * @param res
  */
 exports.authenticate = function(req, res) {
+    var type = req.type;
     var username = req.params.user;
     var password = req.params.password;
 
     req.models.user.findOne({where: {name: username}}, function(err, user) {
+        console.log(user.types.indexOf('cluster'));
         if (!user) {
-            res.send(401);
+            res.send(401, "Failed");
+
+            return;
+        }
+
+        if (user.types.indexOf(type) < 0) {
+            res.send(402, "Failed");
 
             return;
         }
 
         if (user.password == generatePassword(user.salt, password)) {
-            res.send(200);
+            res.send(200, "Ok");
 
             return;
         }
 
-        res.send(401);
+        res.send(401, "Failed");
     });
 };
 
