@@ -106,19 +106,21 @@ exports.delete = function(req, res) {
  * @param res
  */
 exports.authenticate = function(req, res) {
-    var type = req.type;
+    var type = req.params.type;
     var username = req.params.user;
     var password = req.params.password;
 
     req.models.user.findOne({where: {name: username}}, function(err, user) {
-        console.log(user.types.indexOf('cluster'));
         if (!user) {
             res.send(401, "Failed");
 
             return;
         }
 
-        if (user.types.indexOf(type) < 0) {
+        var typeFind = user.types.find(function(item) {
+            return item.id == type;
+        });
+        if (!typeFind) {
             res.send(402, "Failed");
 
             return;
