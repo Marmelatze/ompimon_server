@@ -1,4 +1,3 @@
-
 # Node JS instalieren
 
 Runterladen und installieren unter [nodejs.org](http://nodejs.org/)
@@ -19,7 +18,7 @@ Nimmt Daten vom Cluster entgegen und speichert diese Zwischen.
 
 ## Client Interface ##
 
-Doku: [node_modules/ompimon-client/README.md](node_modules/ompimon-client/README.md)
+Doku: [node_modules/ompimon-client/README.md](https://gitlab.freedomvpn.net/swp/server/tree/master/node_modules/ompimon-client/README.md)
 
 
 # Backend #
