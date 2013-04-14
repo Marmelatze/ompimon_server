@@ -12,8 +12,6 @@ var crypto = require("crypto"),
  */
 exports.list = function (req, res) {
     req.models.user.all(function(err, users) {
-        console.log(_.indexOf(users[0]['types'], 'cluster'));
-
         res.render('user/list', {users: users});
     });
 };
