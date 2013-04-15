@@ -7,6 +7,7 @@
     },
     "dependencies": {
         "ompimon-cluster": "*",
-        "ompimon-protocol": "*"
+        "ompimon-protocol": "*",
+        "ompimon-client": "*"
     }
 }
