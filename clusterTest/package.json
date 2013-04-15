@@ -5,6 +5,7 @@
         "buffer-builder": "*",
         "binary": "*",
         "commander": "*",
-        "underscore": "*"
+        "underscore": "*",
+        "cli-prompt": "*"
     }
 }
