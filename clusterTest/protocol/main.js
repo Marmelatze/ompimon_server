@@ -14,20 +14,26 @@ _.each(actions, function(actionClass, id) {
     actionMap[id] = new action();
 });
 
-exports.parse = function(buf, callback){
+exports.parse = function(client, buf, callback){
     var actionId = buf.readUInt8(0);
+
     var actionClass = this.getActionClass(actionId);
     if (actionClass) {
-        actionClass.parse(buf.slice(1, buf.length), callback);
+        actionClass.parse(client, buf.slice(1, buf.length), callback);
     }
 };
 
-exports.execute = function(client, actionId){
-    var actionClass = this.getActionClass(actionId);
-    if(actionClass){
-        actionClass.execute(client);
+exports.execute = function(client, actionId, callback){
+    if(actionId != 0 && client.token == ''){
+        console.log("first authenticate!");
+        callback();
     }else{
-        console.log("Ups, something is broken!");
+        var actionClass = this.getActionClass(actionId);
+        if(actionClass){
+            actionClass.execute(client);
+        }else{
+            console.log("Ups, something is broken!");
+        }
     }
 
 };

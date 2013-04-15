@@ -8,19 +8,20 @@ var net = require('net'),
     BufferBuilder = require('buffer-builder'),
     binary = require('binary'),
     program = require('commander'),
-    protocol = require('./protocol'),
-    prompt = require('cli-prompt');
+    protocol = require('./protocol');
 
-var client = net.connect({port: 8214}, function() {
+var client = net.connect({port: 8214},function() {
+    this.token = '';
     console.log('client connected');
 
     executeAction();
 
 });
 
+
 client.on('data', function(data) {
     console.log("received:", data);
-    protocol.parse(data, function() {
+    protocol.parse(client, data, function() {
         executeAction();
     });
 });
@@ -30,8 +31,9 @@ client.on('end', function() {
 
 
 function executeAction(){
-    prompt('Enter Protocol Action-ID: ', function (actionId) {
-        protocol.execute(client, actionId);
-        return;
+    program.prompt('Enter Protocol Action-ID: ', function (actionId) {
+        protocol.execute(client, actionId, function(){
+            executeAction();
+        });
     });
 }

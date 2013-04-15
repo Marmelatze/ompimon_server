@@ -17,7 +17,7 @@ Action.prototype = Object.create(eventEmitter.prototype, {
     }
 });
 
-Action.prototype.parse = function(buf, callback) {
+Action.prototype.parse = function(client, buf, callback) {
     var type = buf.readUInt8(0);
     buf = buf.slice(1,buf.length);
     if(type == 0){
@@ -29,10 +29,14 @@ Action.prototype.parse = function(buf, callback) {
     }else if(type == 3){
         console.log("type = 3");
     }
-    this.parseType(type,buf, callback);
+
+    this.parseType(client, type, buf, callback);
+
+
+
 };
 
-Action.prototype.parseType = function(type, buf, callback){
+Action.prototype.parseType = function(client, type, buf, callback){
     console.log("not implemented");
 };
 
