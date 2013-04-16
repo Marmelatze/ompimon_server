@@ -1,0 +1,8 @@
+{
+    "name": "client protocol library",
+    "main": "main.js",
+    "dependencies": {
+        "binary": "*",
+        "buffer-builder": "*"
+    }
+}

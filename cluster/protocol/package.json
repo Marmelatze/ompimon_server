@@ -1,9 +1,0 @@
-{
-    "name": "protocol library",
-    "main": "main.js",
-    "dependencies": {
-        "binary": "*",
-        "buffer-builder": "*",
-        "underscore": "*"
-    }
-}

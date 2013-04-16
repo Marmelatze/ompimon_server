@@ -2,7 +2,8 @@
  * GET users listing.
  */
 
-var crypto = require("crypto");
+var crypto = require("crypto"),
+    _ = require('underscore');
 
 /**
  * List all users
@@ -105,23 +106,33 @@ exports.delete = function(req, res) {
  * @param res
  */
 exports.authenticate = function(req, res) {
+    var type = req.params.type;
     var username = req.params.user;
     var password = req.params.password;
 
     req.models.user.findOne({where: {name: username}}, function(err, user) {
         if (!user) {
-            res.send(401);
+            res.send(401, "Failed");
+
+            return;
+        }
+
+        var typeFind = user.types.find(function(item) {
+            return item.id == type;
+        });
+        if (!typeFind) {
+            res.send(402, "Failed");
 
             return;
         }
 
         if (user.password == generatePassword(user.salt, password)) {
-            res.send(200);
+            res.send(200, "Ok");
 
             return;
         }
 
-        res.send(401);
+        res.send(401, "Failed");
     });
 };
 

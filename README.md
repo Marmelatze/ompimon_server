@@ -1,4 +1,3 @@
-
 # Node JS instalieren
 
 Runterladen und installieren unter [nodejs.org](http://nodejs.org/)
@@ -17,6 +16,11 @@ __@TODO__
 
 Nimmt Daten vom Cluster entgegen und speichert diese Zwischen.
 
+## Client Interface ##
+
+Doku: [node_modules/ompimon-client/README.md](https://gitlab.freedomvpn.net/swp/server/tree/master/node_modules/ompimon-client/README.md)
+
+
 # Backend #
 
 Benutzerverwaltung
@@ -24,16 +28,12 @@ Benutzerverwaltung
 ## Backend starten ##
 
     cd backend
-    cp config.js.dist config.js
-
-
-MySQL Server Einstellungen in `config.js` anpassen.
-
-Dann Server starten
-
     node app.js
 
 Browser öffnen mit http://localhost:3000
+
+
+
 
 ## Dokus ##
 

@@ -1,0 +1,13 @@
+{
+    "name": "ompimon",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "test": "sh ./test.sh"
+    },
+    "dependencies": {
+        "ompimon-cluster": "*",
+        "ompimon-protocol": "*",
+        "ompimon-client": "*"
+    }
+}
