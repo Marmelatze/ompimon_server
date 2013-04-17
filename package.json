@@ -8,6 +8,7 @@
     "dependencies": {
         "ompimon-cluster": "*",
         "ompimon-protocol": "*",
-        "ompimon-client": "*"
+        "ompimon-client": "*",
+        "redis": "*"
     }
 }

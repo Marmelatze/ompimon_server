@@ -24,7 +24,7 @@ exports.parse = function(client, buf, callback){
 };
 
 exports.execute = function(client, actionId, callback){
-    if(actionId != 0 && client.token == ''){
+    if(false && actionId != 0 && client.token == ''){
         console.log("first authenticate!");
         callback();
     }else{
