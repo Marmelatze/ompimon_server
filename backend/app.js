@@ -1,5 +1,7 @@
 /**
  * Module dependencies.
+ * @module ompimon
+ * @submodule ompimon-backend
  */
 
 var express = require('express'),
