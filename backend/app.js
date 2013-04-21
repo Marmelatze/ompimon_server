@@ -1,5 +1,6 @@
 /**
  * Module dependencies.
+ *
  * @module ompimon
  * @submodule ompimon-backend
  */
