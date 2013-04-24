@@ -1,5 +1,9 @@
-/*
- * GET users listing.
+/**
+ * Manage Users
+ * @module ompimon
+ * @submodule ompimon-backend
+ * @class User
+ * @namespace Ompimon.Backend.User
  */
 
 var crypto = require("crypto"),
@@ -7,6 +11,7 @@ var crypto = require("crypto"),
 
 /**
  * List all users
+ * @method list
  * @param req
  * @param res
  */
@@ -18,6 +23,7 @@ exports.list = function (req, res) {
 
 /**
  * Create new users
+ * @method add
  * @param req
  * @param res
  */
@@ -41,6 +47,7 @@ exports.add = function (req, res) {
 
 /**
  * middleware for loading users
+ * @method load
  * @param req
  * @param res
  * @param next
@@ -56,6 +63,7 @@ exports.load = function (req, res, next) {
 
 /**
  * edit users
+ * @method edit
  * @param req
  * @param res
  */
@@ -90,6 +98,7 @@ exports.edit = function (req, res) {
 
 /**
  * delete users
+ * @method delete
  * @param req
  * @param res
  */
@@ -102,6 +111,7 @@ exports.delete = function(req, res) {
 /**
  * Authenticate api
  * Returns HTTP Status 200 if successfull or 401 if failed
+ * @method authenticate
  * @param req
  * @param res
  */
