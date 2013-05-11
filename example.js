@@ -57,6 +57,8 @@ function getInit() {
 
     var data = stub.initData;
     data.ranks = ranks;
+    data.processes = 5;
+    data.nodes = 1;
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x01);
     buffer.appendBuffer(stub.buildInit(data).get());
