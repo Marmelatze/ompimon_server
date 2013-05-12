@@ -27,11 +27,19 @@ var client = net.connect({port: 8214}, function() {
         console.log(data);
         var parser = new Parser(data);
         var action = parser.readUInt8();
-        var status = parser.readUInt8();
-        if (action == 1 && status == 0) {
-            setInterval(function() {
-                send();
-            }, 5000);
+
+        if (action == 1) {
+            var status = parser.readUInt8();
+            if (status == 0) {
+                setInterval(function() {
+                    send();
+                }, 5000);
+            }
+
+        }
+        if (action == 5 ) {
+            var func = parser.readUInt32();
+            client.write(getSendDetail(func));
         }
     });
 
@@ -103,6 +111,46 @@ function getData() {
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x02);
     buffer.appendBuffer(stub.buildSend(data).get());
+
+    return buffer.get();
+}
+
+
+function getSendDetail(func) {
+    console.log("get data for function " + func);
+
+    var buildData = function(ownRank) {
+        var result = [];
+        ranks.forEach(function (rank) {
+            if (rank == ownRank || Math.round(Math.random()) == 1) {
+                return;
+            }
+
+            result.push({
+                rank: rank,
+                counter: random(),
+                size: random()
+            });
+        });
+
+        return result;
+    };
+
+    var result = [];
+    ranks.forEach(function (rank) {
+        result.push({
+            rank: rank,
+            data: buildData(rank)
+        });
+    });
+    var data = {
+        sendId: func,
+        data: result
+    };
+
+    var buffer = new BufferBuilder();
+    buffer.appendUInt8(0x05);
+    buffer.appendBuffer(stub.buildSendDetail(data).get());
 
     return buffer.get();
 }
