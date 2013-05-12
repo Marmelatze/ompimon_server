@@ -37,6 +37,9 @@ var client = net.connect({port: 8214}, function() {
             }
 
         }
+        if (action == 3) {
+            client.write(getDataDetail());
+        }
         if (action == 5 ) {
             var func = parser.readUInt32();
             client.write(getSendDetail(func));
@@ -57,6 +60,7 @@ function send() {
 
 
 var ranks = [1, 2, 3, 4, 5];
+var sends = ['ibsend', 'bsend', 'rsend'];
 
 function getInit() {
     if (files) {
@@ -64,6 +68,7 @@ function getInit() {
     }
 
     var data = stub.initData;
+    data.app = "Dummy node app";
     data.ranks = ranks;
     data.processes = 5;
     data.nodes = 1;
@@ -115,6 +120,43 @@ function getData() {
     return buffer.get();
 }
 
+function getDataDetail() {
+    console.log("get data detail");
+
+    var buildFunctions = function(ownRank) {
+        var funcs = {};
+        sends.forEach(function(send) {
+            funcs[send] = [];
+
+            ranks.forEach(function(rank) {
+                if (rank == ownRank || Math.round(Math.random()) == 1) {
+                    return;
+                }
+                funcs[send].push({
+                    rank: rank,
+                    counter: random(),
+                    size: random()
+                });
+            });
+        });
+
+        return funcs;
+    };
+
+    var data = [];
+    ranks.forEach(function (rank) {
+        data.push({
+            rank: rank,
+            functions: buildFunctions(rank)
+        });
+    });
+
+    var buffer = new BufferBuilder();
+    buffer.appendUInt8(0x03);
+    buffer.appendBuffer(stub.buildDataDetail(data).get());
+
+    return buffer.get();
+}
 
 function getSendDetail(func) {
     console.log("get data for function " + func);
