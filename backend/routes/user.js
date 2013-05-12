@@ -29,10 +29,11 @@ exports.list = function (req, res) {
  */
 exports.add = function (req, res) {
     if ("POST" == req.method) {
+        var salt = generateSalt();
         req.models.user.create({
-            salt: generateSalt(),
+            salt: salt,
             name: req.body.name,
-            password: generatePassword(this.salt, req.body.password),
+            password: generatePassword(salt, req.body.password),
             types: req.body.types
         });
 
