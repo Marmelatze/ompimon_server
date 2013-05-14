@@ -2,6 +2,9 @@
 
 Runterladen und installieren unter [nodejs.org](http://nodejs.org/)
 
+## Doku
+https://gitlab.freedomvpn.net/docs/server/index.html
+
 
 ## Node.js Plugin für Phpstorm ##
 
