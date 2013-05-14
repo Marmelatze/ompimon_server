@@ -122,7 +122,7 @@ function getDataDetail() {
             funcs[send] = [];
 
             ranks.forEach(function(rank) {
-                if (rank == ownRank || Math.round(Math.random()) == 1) {
+                if (rank == ownRank) {
                     return;
                 }
                 funcs[send].push({
