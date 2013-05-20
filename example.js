@@ -24,9 +24,10 @@ var client = net.connect({port: 8214}, function() {
         if (action == 1) {
             var status = parser.readUInt8();
             if (status == 0) {
+                /*
                 setInterval(function() {
                     send();
-                }, 5000);
+                }, 5000);*/
             }
 
         }
