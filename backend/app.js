@@ -10,9 +10,12 @@ var express = require('express'),
     swig = require('swig'),
     routes = require('./routes'),
     user = require('./routes/user'),
+    monitor = require('./routes/monitor'),
     http = require('http'),
     path = require('path'),
-    Schema = require("jugglingdb").Schema;
+    Schema = require("jugglingdb").Schema,
+    io = require("socket.io");
+
 
 var app = express();
 
@@ -66,6 +69,10 @@ app.all('/users/:user/edit', user.load, user.edit);
 app.get('/users/:user/delete', user.load, user.delete);
 app.get('/auth/:type/:user/:password', user.authenticate);
 
-http.createServer(app).listen(app.get('port'), function () {
+app.get('/monitor', monitor.index);
+
+var server = http.createServer(app);
+io.listen(server);
+server.listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
 });
