@@ -3,7 +3,7 @@ module.exports = function(schema) {
         name: {type: String, index: true},
         password: String,
         salt: String,
-        types: Array
+        types: {type: Array, default: []}
     });
 
 

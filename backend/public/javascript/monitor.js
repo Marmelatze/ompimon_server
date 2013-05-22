@@ -2,23 +2,8 @@
     var canvas = oCanvas.create({ canvas: "#canvas", background: "#222" });
 
     var components = {
-        clusterClients: [
-            {
-                type: "cluster",
-                name: "29412jadsfbasfd"
-            }
-        ],
-        clusterNodes: [
-            {
-                type: "node_cluster",
-                name: 456
-            },
-            {
-                type: "node_cluster",
-                name: 123
-            }
-        ]
-
+        cluster: [],
+        cluster_node: []
     };
     var clusterClients = canvas.display.rectangle({
         x: 10,
@@ -41,7 +26,6 @@
     });
     canvas.addChild(clusterNodes);
 
-    drawComponents(clusterClients, components.clusterClients, '#7cbb6f');
 
     function drawComponents(parent, components, color) {
         var padding = 3;
@@ -49,9 +33,10 @@
         var y = padding;
         var width = parent.width - 2*padding;
         var height = ((parent.height - padding) / components.length) - padding;
+        console.log(color);
         components.forEach(function(component) {
             if (null == component.canvas) {
-                var client = canvas.display.rectangle({
+                var comp = canvas.display.rectangle({
                     x: x,
                     y: y,
                     width: width,
@@ -73,12 +58,12 @@
 
                 });
 
-                client.addChild(text);
-                parent.addChild(client);
+                comp.addChild(text);
+                parent.addChild(comp);
 
-                client.fadeIn();
+                comp.fadeIn();
                 text.fadeIn();
-                component.canvas = client;
+                component.canvas = comp;
             } else {
                 component.canvas.animate({
                     height: height,
@@ -89,7 +74,7 @@
             y += height + padding;
         });
     }
-
+/*
     setInterval(function() {
         components.clusterClients.push({
             type: "cluster",
@@ -98,6 +83,56 @@
         drawComponents(clusterClients, components.clusterClients, '#7cbb6f');
 
     }, 5000);
+*/
+
+    var draw = function(type) {
+        switch(type) {
+            case 'cluster_node':
+                drawClusterNodes();
+                break;
+            case 'cluster':
+                drawClusterClients();
+                break;
+        }
+    };
+
+    var drawClusterNodes = _.debounce(function(){
+        drawComponents(clusterNodes, components.cluster_node, '#97CF5A');
+    }, 500);
+
+    var drawClusterClients = _.debounce(function(){
+        drawComponents(clusterClients, components.cluster, '#399BDA');
+    }, 500);
+
+
+    var socket = io.connect(window.location.origin);
+    socket.on('init', function(data) {
+        components = data;
+        draw('cluster_node');
+        draw('cluster');
+    });
+    socket.on('message', function (data) {
+        console.log(data);
+        var payload = data.data;
+        switch(data.type) {
+            case 'add':
+                components[payload.type].push(payload);
+                draw(payload.type);
+                break;
+            case 'remove':
+                _.each(components[payload.type], function(component, index) {
+                    if (component.name == payload.name) {
+                        component.canvas.fadeOut("short", function(){
+                            this.remove();
+                            draw(payload.type);
+                            components[payload.type].splice(index, 1);
+
+                        })
+                    }
+                });
+                break;
+        }
+    });
 
 
 
