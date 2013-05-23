@@ -1,42 +1,136 @@
-(function($){
-    var canvas = oCanvas.create({ canvas: "#canvas", background: "#222" });
+function Monitor() {
+    this.init.call(this, arguments);
+};
 
-    var components = {
-        cluster: [],
-        cluster_node: []
-    };
-    var clusterClients = canvas.display.rectangle({
-        x: 10,
-        y: 10,
-        width: 250,
-        height: canvas.height-20,
-        stroke: "inside 1px #FFF"
-    });
-    canvas.addChild(clusterClients);
+_.extend(Monitor.prototype, {
+    init: function() {
+        this.messageQueue = [];
+        this.messageDrawing = false;
+        this.canvas = oCanvas.create({ canvas: "#canvas", background: "#222" });
+
+        this.components = {
+            cluster: [],
+            cluster_node: [],
+            client_node: [],
+            client: [],
+            db: [{
+                type: 'db',
+                name: 'Redis'
+            }]
+        };
+        this.componentsMap = {};
+        this.clusterClients = this.canvas.display.rectangle({
+            x: 10,
+            y: 30,
+            width: 250,
+            height: canvas.height-40,
+            stroke: "inside 1px #FFF"
+        });
+        this.canvas.addChild(this.clusterClients);
+
+
+        this.clusterNodes = this.canvas.display.rectangle({
+            x: 300,
+            y: 30,
+            width: 150,
+            height: 350,
+            stroke: "inside 1px #FFF"
+        });
+        this.canvas.addChild(this.clusterNodes);
+
+        this.clientNodes = this.canvas.display.rectangle({
+            x: 480,
+            y: 30,
+            width: 150,
+            height: 350,
+            stroke: "inside 1px #FFF"
+        });
+        this.canvas.addChild(this.clientNodes);
+
+
+        this.clients = this.canvas.display.rectangle({
+            x: 670,
+            y: 30,
+            width: 250,
+            height: canvas.height-40,
+            stroke: "inside 1px #FFF"
+        });
+        this.canvas.addChild(this.clients);
+
+
+        this.canvas.addChild(this.canvas.display.rectangle({
+            x: 295,
+            y: 5,
+            width: 340,
+            height: canvas.height - 10,
+            stroke: "inside 1px #FFF"
+        }));
+
+        this.dbs = this.canvas.display.rectangle({
+            x: 300,
+            y: 390,
+            width: 330,
+            height: 100,
+            stroke: "inside 1px #FFF"
+        });
+        this.canvas.addChild(this.dbs);
+
+
+        // text
+
+        this.canvas.addChild(this.canvas.display.text({
+            x: 10,
+            y: 10,
+            origin: { x: "left", y: "center" },
+            align: "center",
+            font: "12px sans-serif",
+            text: "Cluster",
+            fill: "#fff"
+        }));
+        this.canvas.addChild(this.canvas.display.text({
+            x: 300,
+            y: 15,
+            origin: { x: "left", y: "center" },
+            align: "center",
+            font: "12px sans-serif",
+            text: "Cluster Server",
+            fill: "#fff"
+        }));
+        this.canvas.addChild(this.canvas.display.text({
+            x: 480,
+            y: 15,
+            origin: { x: "left", y: "center" },
+            align: "center",
+            font: "12px sans-serif",
+            text: "Client Server",
+            fill: "#fff"
+        }));
 
 
 
 
-    var clusterNodes = canvas.display.rectangle({
-        x: 300,
-        y: 10,
-        width: 200,
-        height: canvas.height-20,
-        stroke: "inside 1px #FFF"
-    });
-    canvas.addChild(clusterNodes);
 
+        this.canvas.addChild(this.canvas.display.text({
+            x: 670,
+            y: 10,
+            origin: { x: "left", y: "center" },
+            align: "center",
+            font: "12px sans-serif",
+            text: "Clients",
+            fill: "#fff"
+        }));
 
-    function drawComponents(parent, components, color) {
+        this.listen();
+    },
+    drawComponents: function(parent, components, color, fontColor) {
         var padding = 3;
         var x = padding;
         var y = padding;
         var width = parent.width - 2*padding;
         var height = ((parent.height - padding) / components.length) - padding;
-        console.log(color);
         components.forEach(function(component) {
             if (null == component.canvas) {
-                var comp = canvas.display.rectangle({
+                var comp = this.canvas.display.rectangle({
                     x: x,
                     y: y,
                     width: width,
@@ -45,7 +139,7 @@
                     opacity: 0
                 });
 
-                var text = canvas.display.text({
+                var text = this.canvas.display.text({
                     x: 10,
                     y: 10,
                     width: width,
@@ -53,9 +147,8 @@
                     align: "center",
                     font: "12px sans-serif",
                     text: component.name,
-                    fill: "#fff",
+                    fill: fontColor || "#fff",
                     opacity: 0
-
                 });
 
                 comp.addChild(text);
@@ -64,6 +157,7 @@
                 comp.fadeIn();
                 text.fadeIn();
                 component.canvas = comp;
+                this.componentsMap[component.type+":"+component.name] = component;
             } else {
                 component.canvas.animate({
                     height: height,
@@ -72,68 +166,206 @@
             }
 
             y += height + padding;
-        });
-    }
-/*
-    setInterval(function() {
-        components.clusterClients.push({
-            type: "cluster",
-            name: Math.random()
-        });
-        drawComponents(clusterClients, components.clusterClients, '#7cbb6f');
+        }, this);
+    },
+    draw: function(type) {
 
-    }, 5000);
-*/
-
-    var draw = function(type) {
         switch(type) {
             case 'cluster_node':
-                drawClusterNodes();
+                this.drawClusterNodes();
                 break;
             case 'cluster':
-                drawClusterClients();
+                this.drawClusterClients();
+                break;
+            case 'client_node':
+                this.drawClientNodes();
+                break;
+            case 'client':
+                this.drawClients();
+                break;
+            case 'db':
+                this.drawDB();
                 break;
         }
-    };
+    },
+    drawClusterNodes: _.debounce(function(){
+        console.log(this);
+        this.drawComponents(this.clusterNodes, this.components.cluster_node, '#97CF5A');
+    }, 500),
 
-    var drawClusterNodes = _.debounce(function(){
-        drawComponents(clusterNodes, components.cluster_node, '#97CF5A');
-    }, 500);
+    drawClusterClients: _.debounce(function(){
+        this.drawComponents(this.clusterClients, this.components.cluster, '#399BDA');
+    }, 500),
 
-    var drawClusterClients = _.debounce(function(){
-        drawComponents(clusterClients, components.cluster, '#399BDA');
-    }, 500);
+    drawClientNodes: _.debounce(function(){
+        this.drawComponents(this.clientNodes, this.components.client_node, '#DE6314');
+    }, 500),
+
+    drawClients: _.debounce(function(){
+        this.drawComponents(this.clients, this.components.client, '#00BBBB');
+    }, 500),
+    drawDB: _.debounce(function(){
+        this.drawComponents(this.dbs, this.components.db, '#FECC22', '#000');
+    }, 500),
 
 
-    var socket = io.connect(window.location.origin);
-    socket.on('init', function(data) {
-        components = data;
-        draw('cluster_node');
-        draw('cluster');
-    });
-    socket.on('message', function (data) {
-        console.log(data);
+
+    listen: function() {
+        var socket = io.connect(window.location.origin);
+        socket.on('init', function(data) {
+            data.db = [
+                {
+                    type: 'db',
+                    name: 'Redis'
+                }
+            ];
+            this.components = data;
+            this.draw('cluster_node');
+            this.draw('cluster');
+            this.draw('client_node');
+            this.draw('client');
+            this.draw('db');
+        }.bind(this));
+        socket.on('message', function (data) {
+            this.handleMessage(data);
+        }.bind(this));
+
+        setInterval(function() {
+            this.drawMessages();
+        }.bind(this), 100);
+
+    },
+    handleMessage: function(data) {
+        var self = this;
         var payload = data.data;
         switch(data.type) {
             case 'add':
-                components[payload.type].push(payload);
-                draw(payload.type);
+                this.components[payload.type].push(payload);
+                this.draw(payload.type);
                 break;
             case 'remove':
-                _.each(components[payload.type], function(component, index) {
+                _.each(this.components[payload.type], function(component, index) {
                     if (component.name == payload.name) {
                         component.canvas.fadeOut("short", function(){
                             this.remove();
-                            draw(payload.type);
-                            components[payload.type].splice(index, 1);
+                            self.draw(payload.type);
+                            self.components[payload.type].splice(index, 1);
 
-                        })
+                        });
                     }
-                });
+                }, this);
+                break;
+            case 'message':
+                    this.messageQueue.push({from: payload.from, to: payload.to});
                 break;
         }
-    });
+    },
+
+    getById: function(id) {
+        if (id == "db") {
+            id = "db:Redis";
+        }
+        return this.componentsMap[id];
+    },
+
+    drawMessages: function() {
+        if (this.messageDrawing) {
+            return false;
+        }
+
+        this.messageDrawing = true;
+        async.whilst(
+            function() {
+                return this.messageQueue.length > 0;
+            }.bind(this),
+            function (callback) {
+                var message = this.messageQueue.shift();
+                this.drawMessage(message.from, message.to, callback);
+            }.bind(this),
+            function (err) {
+                this.messageDrawing = false;
+            }.bind(this)
+        )
+    },
+
+    drawMessage: function(fromId, toId, callback, force) {
+        var from = this.getById(fromId);
+        var to = this.getById(toId);
+
+        if (from == null || to == null) {
+            if (!force) {
+                setTimeout(function() {
+                    this.drawMessage(fromId, toId, callback, true);
+                }.bind(this), 500);
+            }
 
 
+            return;
+        }
+
+        if (null == from.count) {
+            from.count = 0;
+        }
+        if (null == to.count) {
+            to.count = 0;
+        }
+
+        from.count++;
+        to.count++;
+
+        var start = {
+            x: from.canvas.abs_x + from.canvas.width/2 + 5,
+            y: from.canvas.abs_y + 10
+        };
+
+        var end = {
+            x: to.canvas.abs_x + to.canvas.width/2 - 5,
+            y: to.canvas.abs_y + 10
+        };
+
+        var padding = 10;
+        if (start.y + from.count*padding > from.canvas.abs_y + from.canvas.height -10) {
+            from.count = 0;
+        }
+        start.y += from.count * padding;
+
+        if (end.y + to.count*padding > to.canvas.abs_y + to.canvas.height - 10) {
+            to.count = 0;
+        }
+        end.y += to.count * padding;
+
+
+        var line = this.canvas.display.line({
+            start: start,
+            end: start,
+            stroke: "5px #BB00BB",
+            cap: "round"
+        });
+        this.canvas.addChild(line);
+        line.animate({
+            end: end
+        }, {
+            duration: 200
+        /*   callback: callback*/
+        });
+        setTimeout(function() {
+            callback();
+        }, 250);
+        setTimeout(function() {
+            line.fadeOut();
+        }, 500);
+    },
+
+    random: function (min, max) {
+        return Math.random() * (max - min) + min;
+    }
+});
+
+
+
+
+
+(function($){
+    new Monitor();
 
 })(jQuery);

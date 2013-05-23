@@ -83,7 +83,9 @@ server.listen(app.get('port'), function () {
 redis.subscribe('monitor');
 var components = {
     cluster: [],
-    cluster_node: []
+    cluster_node: [],
+    client_node: [],
+    client: []
 };
 io.sockets.on('connection', function (socket) {
     socket.emit('init', components);
