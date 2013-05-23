@@ -51,7 +51,7 @@ function send() {
     client.write(getData());
 }
 
-
+var totalRanks = [1, 2, 3, 4, 5, 6];
 var ranks = [1, 2];
 if (instance > 0) {
     ranks = _.map(ranks, function(rank) {
@@ -66,8 +66,8 @@ function getInit() {
     var data = stub.initData;
     data.app = "Dummy node app";
     data.ranks = ranks;
-    data.processes = 10;
-    data.nodes = 2;
+    data.processes = 6;
+    data.nodes = 3;
     data.nodeId = instance;
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x01);
@@ -79,8 +79,8 @@ function getInit() {
 function getData() {
     var buildData = function(ownRank) {
         var result = [];
-        ranks.forEach(function (rank) {
-            if (rank == ownRank || Math.round(Math.random()) == 1) {
+        totalRanks.forEach(function (rank) {
+            if (rank == ownRank) {
                 return;
             }
 
@@ -105,7 +105,6 @@ function getData() {
             data: buildData(rank)
         })
     });
-
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x02);
     buffer.appendBuffer(stub.buildSend(data).get());
@@ -121,7 +120,7 @@ function getDataDetail() {
         sends.forEach(function(send) {
             funcs[send] = [];
 
-            ranks.forEach(function(rank) {
+            totalRanks.forEach(function(rank) {
                 if (rank == ownRank) {
                     return;
                 }
