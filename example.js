@@ -5,20 +5,13 @@ var
     Parser = require("ompimon-protocol/parser"),
     stub = require("ompimon-protocol/test-stub"),
 
-    BufferBuilder = require("buffer-builder")
+    BufferBuilder = require("buffer-builder"),
+
+    _ = require("underscore")
 ;
 
-var files = false;
-
-var queue = [];
-
-for (var i = 0; i < process.argv.length - 2; i++) {
-    var file = process.argv[i+2];
-    console.log(file);
-    var content = fs.readFileSync(file);
-
-    queue.push(content);
-}
+var instance = process.argv[2] || 0;
+console.log("starting instance " + instance);
 
 var client = net.connect({port: 8214}, function() {
     console.log('client connected');
@@ -59,19 +52,23 @@ function send() {
 }
 
 
-var ranks = [1, 2, 3, 4, 5];
+var ranks = [1, 2];
+if (instance > 0) {
+    ranks = _.map(ranks, function(rank) {
+        return rank+(2*instance);
+    });
+}
+console.log(ranks);
 var sends = ['ibsend', 'bsend', 'rsend'];
 
 function getInit() {
-    if (files) {
-        return  fs.readFileSync("examples/action1out0.bin");
-    }
 
     var data = stub.initData;
     data.app = "Dummy node app";
     data.ranks = ranks;
-    data.processes = 5;
-    data.nodes = 1;
+    data.processes = 10;
+    data.nodes = 2;
+    data.nodeId = instance;
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x01);
     buffer.appendBuffer(stub.buildInit(data).get());
@@ -80,10 +77,6 @@ function getInit() {
 }
 
 function getData() {
-    if (files) {
-        return fs.readFileSync("examples/action2out2.bin");
-    }
-
     var buildData = function(ownRank) {
         var result = [];
         ranks.forEach(function (rank) {
