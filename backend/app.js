@@ -10,9 +10,15 @@ var express = require('express'),
     swig = require('swig'),
     routes = require('./routes'),
     user = require('./routes/user'),
+    monitor = require('./routes/monitor'),
     http = require('http'),
     path = require('path'),
-    Schema = require("jugglingdb").Schema;
+    Schema = require("jugglingdb").Schema,
+    io = require("socket.io"),
+    redis = require("redis").createClient(),
+    _ = require("underscore")
+;
+
 
 var app = express();
 
@@ -66,6 +72,42 @@ app.all('/users/:user/edit', user.load, user.edit);
 app.get('/users/:user/delete', user.load, user.delete);
 app.get('/auth/:type/:user/:password', user.authenticate);
 
-http.createServer(app).listen(app.get('port'), function () {
+app.get('/monitor', monitor.index);
+
+var server = http.createServer(app);
+io = io.listen(server);
+server.listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
+});
+
+redis.subscribe('monitor');
+var components = {
+    cluster: [],
+    cluster_node: [],
+    client_node: [],
+    client: []
+};
+io.sockets.on('connection', function (socket) {
+    socket.emit('init', components);
+});
+
+redis.on('message', function(channel, message) {
+    message = JSON.parse(message);
+    var payload = message.data;
+    var array = components[payload.type];
+    if (message.type == 'add') {
+        if (_.where(array, {name: payload.name}).length > 0) {
+            return;
+        }
+        components[payload.type].push(payload);
+    }
+    if (message.type == 'remove') {
+        _.each(array, function(value, index) {
+            if (value.name == payload.name) {
+                array.splice(index, 1);
+            }
+        });
+    }
+
+    io.sockets.emit('message', message);
 });
