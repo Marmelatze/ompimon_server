@@ -4,6 +4,7 @@ function Monitor() {
 
 _.extend(Monitor.prototype, {
     init: function() {
+        this.delay = 250;
         this.messageQueue = [];
         this.messageDrawing = false;
         this.canvas = oCanvas.create({ canvas: "#canvas", background: "#222" });
@@ -350,7 +351,8 @@ _.extend(Monitor.prototype, {
         });
         setTimeout(function() {
             callback();
-        }, 250);
+        }, this.delay);
+        console.log(this.delay);
         setTimeout(function() {
             line.fadeOut();
         }, 500);
@@ -366,6 +368,21 @@ _.extend(Monitor.prototype, {
 
 
 (function($){
-    new Monitor();
+    var monitor = new Monitor();
+
+    $('#delay-minus').click(function(event) {
+        event.preventDefault();
+        monitor.delay -= 100;
+        $('#delay').val(monitor.delay);
+    });
+    $('#delay-plus').click(function(event) {
+        event.preventDefault();
+        monitor.delay += 100;
+        $('#delay').val(monitor.delay);
+    });
+
+    $('#delay').change(function() {
+        monitor.delay = $(this).val();
+    });
 
 })(jQuery);
