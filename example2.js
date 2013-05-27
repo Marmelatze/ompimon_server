@@ -1,7 +1,8 @@
 var
     fs = require("fs"),
     _ = require("underscore"),
-    net = require("net")
+    net = require("net"),
+    async = require("async")
 
     ;
 
@@ -31,7 +32,19 @@ var client = net.connect({port: 8214}, function() {
 });
 
 function send() {
-    while (files.length > 0) {
+    async.whilst(function() {
+        return files.length > 0;
+    },
+    function (callback) {
+        console.log("send");
+        var file = files.shift();
+        var content = fs.readFileSync(file);
 
-    }
+        client.write(content);
+
+        setTimeout(callback, 1);
+    },
+    function (err) {
+        console.log(err);
+    });
 }
