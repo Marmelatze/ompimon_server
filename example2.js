@@ -20,7 +20,9 @@ var client = net.connect({port: 8214}, function() {
         console.log("received:");
         console.log(data);
         if (data.readUInt8(0) == 1) {
-            send();
+            setTimeout(function() {
+                send();
+            }, 500);
         }
     });
 
@@ -42,7 +44,8 @@ function send() {
 
         client.write(content);
 
-        setTimeout(callback, 1);
+        //callback();
+        setTimeout(callback, 0);
     },
     function (err) {
         console.log(err);
