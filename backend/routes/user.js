@@ -128,7 +128,9 @@ exports.authenticate = function(req, res) {
             return;
         }
 
+        console.log(user.types);
         var typeFind = user.types.find(function(item) {
+            console.log(item);
             return item.id == type;
         });
         if (!typeFind) {

@@ -1,0 +1,20 @@
+{% extends "index.html" %}
+
+{% block content %}
+    <ul class="breadcrumb">
+        <li><a href="/">Home</a> <span class="divider">/</span></li>
+        <li class="active"><a href="/monitor">Monitor</a></li>
+    </ul>
+
+    <canvas id="canvas" width="940" height="500"></canvas>
+    <form action="" class="form-inline">
+        <button class="btn btn-danger" id="delay-minus">-</button>
+        <input type="text" id="delay" value="250" />
+        <button class="btn btn-success" id="delay-plus">+</button>
+    </form>
+{% endblock %}
+
+{% block javascripts %}
+    {% parent %}
+    <script type="text/javascript" src="/javascript/monitor.js"></script>
+{% endblock %}

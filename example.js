@@ -24,9 +24,11 @@ var client = net.connect({port: 8214}, function() {
         if (action == 1) {
             var status = parser.readUInt8();
             if (status == 0) {
+
                 setInterval(function() {
                     send();
                 }, 5000);
+
             }
 
         }
@@ -122,7 +124,7 @@ function getDataDetail() {
             funcs[send] = [];
 
             ranks.forEach(function(rank) {
-                if (rank == ownRank || Math.round(Math.random()) == 1) {
+                if (rank == ownRank) {
                     return;
                 }
                 funcs[send].push({

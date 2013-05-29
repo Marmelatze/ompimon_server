@@ -2,9 +2,9 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}SWP Backend{% endblock %}</title>
+    <title>{% block title %}OMPIMON Backend{% endblock %}</title>
 
-    {% block head %}
+    {% block stylesheets %}
     <link rel="stylesheet" href="/stylesheets/style.css">
     {% endblock %}
 </head>
@@ -12,13 +12,22 @@
 <div class="container">
     <div class="navbar">
         <div class="navbar-inner">
-            <a class="brand" href="#">Project Backend</a>
+            <a class="brand" href="#">OMPIMON Backend</a>
             <ul class="nav">
                 <li><a href="/users">Users</a></li>
+                <li><a href="/monitor">Monitor</a></li>
             </ul>
         </div>
     </div>
     {% block content %}{% endblock %}
+    {% block javascripts %}
+        <script type="text/javascript" src="/javascript/jquery.min.js"></script>
+        <script type="text/javascript" src="/javascript/underscore.js"></script>
+        <script type="text/javascript" src="/javascript/ocanvas.min.js"></script>
+        <script type="text/javascript" src="/javascript/async.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+
+    {% endblock %}
 </div>
 </body>
 </html>

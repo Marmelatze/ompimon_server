@@ -11,6 +11,7 @@
     "consolidate": "0.8.0",
     "swig": "0.13.5",
     "jugglingdb": "latest",
-    "jugglingdb-redis": "latest"
+    "jugglingdb-redis": "latest",
+    "socket.io": "latest"
   }
 }
