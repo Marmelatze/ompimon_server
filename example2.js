@@ -1,7 +1,8 @@
 var
     fs = require("fs"),
     _ = require("underscore"),
-    net = require("net")
+    net = require("net"),
+    async = require("async")
 
     ;
 
@@ -19,7 +20,9 @@ var client = net.connect({port: 8214}, function() {
         console.log("received:");
         console.log(data);
         if (data.readUInt8(0) == 1) {
-            send();
+            setTimeout(function() {
+                send();
+            }, 500);
         }
     });
 
@@ -31,7 +34,20 @@ var client = net.connect({port: 8214}, function() {
 });
 
 function send() {
-    while (files.length > 0) {
+    async.whilst(function() {
+        return files.length > 0;
+    },
+    function (callback) {
+        console.log("send");
+        var file = files.shift();
+        var content = fs.readFileSync(file);
 
-    }
+        client.write(content);
+
+        //callback();
+        setTimeout(callback, 0);
+    },
+    function (err) {
+        console.log(err);
+    });
 }

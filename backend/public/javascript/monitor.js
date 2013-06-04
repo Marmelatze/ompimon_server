@@ -378,9 +378,13 @@ _.extend(Monitor.prototype, {
             duration: 200
         /*   callback: callback*/
         });
-        setTimeout(function() {
+        if (this.delay == 0) {
             callback();
-        }, this.delay);
+        } else {
+            setTimeout(function() {
+                callback();
+            }, this.delay);
+        }
         setTimeout(function() {
             line.fadeOut();
         }, 1000);
