@@ -361,7 +361,7 @@ _.extend(Monitor.prototype, {
             y: to.canvas.abs_y + 10
         };
 
-        var size = 5 + message.size/20;
+        var size = 5 + message.size/50;
 
         var padding = size+10;
         if (start.y + from.count*padding > from.canvas.abs_y + from.canvas.height -10) {
