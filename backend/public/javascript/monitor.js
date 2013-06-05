@@ -3,9 +3,34 @@ function Monitor() {
 };
 
 _.extend(Monitor.prototype, {
+
+    colors: {
+        0x00: '#66747B',
+        0x01: '#DE6314',
+        0x02: '#003366',
+        0x03: '#996600',
+        0x04: '#729FCF',
+        0x05: '#64f0ff',
+        0x07: '#7259ff',
+        0xA0: '#ff3815',
+        0xA1: '#a5ff16',
+        0xFF: '#FFFFFF'
+    },
+
     init: function() {
+        this.recording = false;
+        this.historyPosition = 0;
+        var comparator = function(a, b) {
+            var res = a.data.time - b.data.time;
+            if (0 != res) {
+                return res;
+            }
+
+            return a.data.counter - b.data.counter;
+        };
+        this.history = [];
+        this.messageQueue = new Heap(comparator);
         this.delay = 250;
-        this.messageQueue = [];
         this.messageDrawing = false;
         this.canvas = oCanvas.create({ canvas: "#canvas", background: "#222" });
 
@@ -107,10 +132,6 @@ _.extend(Monitor.prototype, {
             fill: "#fff"
         }));
 
-
-
-
-
         this.canvas.addChild(this.canvas.display.text({
             x: 670,
             y: 10,
@@ -169,7 +190,7 @@ _.extend(Monitor.prototype, {
             y += height + padding;
         }, this);
     },
-    draw: function(type) {
+    draw: function(type, callback) {
 
         switch(type) {
             case 'cluster_node':
@@ -188,9 +209,11 @@ _.extend(Monitor.prototype, {
                 this.drawDB();
                 break;
         }
+        if (callback) {
+            setTimeout(callback, 500);
+        }
     },
     drawClusterNodes: _.debounce(function(){
-        console.log(this);
         this.drawComponents(this.clusterNodes, this.components.cluster_node, '#97CF5A');
     }, 500),
 
@@ -228,28 +251,38 @@ _.extend(Monitor.prototype, {
             this.draw('db');
         }.bind(this));
         socket.on('message', function (data) {
-            this.handleMessage(data);
+            if (this.recording) {
+                if (this.history.length > 1000) {
+                    return;
+                }
+                this.history.push(data);
+                this.updateHistoryStatus();
+            } else {
+                this.messageQueue.push(data);
+            }
         }.bind(this));
 
         setInterval(function() {
-            this.drawMessages();
-        }.bind(this), 100);
+            if (!this.recording) {
+                this.drawMessages();
+            }
+        }.bind(this), 500);
 
     },
-    handleMessage: function(data) {
+    handleMessage: function(data, callback) {
         var self = this;
         var payload = data.data;
         switch(data.type) {
             case 'add':
                 this.components[payload.type].push(payload);
-                this.draw(payload.type);
+                this.draw(payload.type, callback);
                 break;
             case 'remove':
                 _.each(this.components[payload.type], function(component, index) {
                     if (component.name == payload.name) {
                         component.canvas.fadeOut("short", function(){
                             this.remove();
-                            self.draw(payload.type);
+                            self.draw(payload.type, callback);
                             self.components[payload.type].splice(index, 1);
 
                         });
@@ -257,7 +290,7 @@ _.extend(Monitor.prototype, {
                 }, this);
                 break;
             case 'message':
-                    this.messageQueue.push({from: payload.from, to: payload.to});
+                this.drawMessage(payload, callback);
                 break;
         }
     },
@@ -275,13 +308,17 @@ _.extend(Monitor.prototype, {
         }
 
         this.messageDrawing = true;
+
+        console.log(this.messageQueue.toArray());
+
         async.whilst(
             function() {
-                return this.messageQueue.length > 0;
+                return !this.messageQueue.empty();
             }.bind(this),
             function (callback) {
-                var message = this.messageQueue.shift();
-                this.drawMessage(message.from, message.to, callback);
+                var message = this.messageQueue.pop();
+                console.log(message.data.from, message.data.to, message.data.time, message.data.counter);
+                this.handleMessage(message, callback);
             }.bind(this),
             function (err) {
                 this.messageDrawing = false;
@@ -289,14 +326,14 @@ _.extend(Monitor.prototype, {
         )
     },
 
-    drawMessage: function(fromId, toId, callback, force) {
-        var from = this.getById(fromId);
-        var to = this.getById(toId);
+    drawMessage: function(message, callback, force) {
+        var from = this.getById(message.from);
+        var to = this.getById(message.to);
 
         if (from == null || to == null) {
             if (!force) {
                 setTimeout(function() {
-                    this.drawMessage(fromId, toId, callback, true);
+                    this.drawMessage(message, callback, true);
                 }.bind(this), 500);
             }
 
@@ -324,7 +361,9 @@ _.extend(Monitor.prototype, {
             y: to.canvas.abs_y + 10
         };
 
-        var padding = 10;
+        var size = 5 + message.size/20;
+
+        var padding = size+10;
         if (start.y + from.count*padding > from.canvas.abs_y + from.canvas.height -10) {
             from.count = 0;
         }
@@ -335,11 +374,14 @@ _.extend(Monitor.prototype, {
         }
         end.y += to.count * padding;
 
+        color = this.colors[message.action] || '#BB00BB';
+
 
         var line = this.canvas.display.line({
             start: start,
             end: start,
-            stroke: "5px #BB00BB",
+            stroke: size+"px "+color,
+            shadow: '0 0 3px #000',
             cap: "round"
         });
         this.canvas.addChild(line);
@@ -349,18 +391,50 @@ _.extend(Monitor.prototype, {
             duration: 200
         /*   callback: callback*/
         });
-        if (this.delay == 0) {
-            callback();
-        } else {
-            setTimeout(function() {
+        if (!this.recording) {
+            if (this.delay == 0) {
                 callback();
-            }, this.delay);
+            } else {
+                setTimeout(function() {
+                    callback();
+                }, this.delay);
+            }
         }
 
-        console.log(this.delay);
         setTimeout(function() {
             line.fadeOut();
-        }, 500);
+        }, 1000);
+    },
+
+    startRecording: function() {
+        this.recording = true;
+        this.history = [];
+        this.historyPosition = 0;
+
+        this.historyStatus = $('<input type="text">');
+        $('#recording').parent().append(this.historyStatus);
+        this.updateHistoryStatus();
+    },
+    goForward: function() {
+        if (this.historyPosition>=this.history.length) {
+            return;
+        }
+        var message = this.history[this.historyPosition];
+        this.historyPosition++;
+        this.updateHistoryStatus();
+        this.handleMessage(message);
+    },
+    goBack: function() {
+        if (this.historyPosition<=0) {
+            return;
+        }
+        this.historyPosition--;
+        var message = this.history[this.historyPosition];
+        this.updateHistoryStatus();
+        this.handleMessage(message);
+    },
+    updateHistoryStatus: function() {
+        this.historyStatus.val(this.historyPosition+"/"+this.history.length);
     },
 
     random: function (min, max) {
@@ -389,5 +463,33 @@ _.extend(Monitor.prototype, {
     $('#delay').change(function() {
         monitor.delay = $(this).val();
     });
+
+    var legend = $('#legend');
+    _.each(monitor.colors, function(color, action) {
+        var row = $('<tr></tr>');
+        var colorCol = $('<td></td>').css({backgroundColor: color});
+        var text = $('<td></td>').html(action);
+        row.append(colorCol).append(text);
+        legend.append(row);
+    });
+
+    $('#recording').click(function(event) {
+        event.preventDefault();
+        monitor.startRecording();
+        $(this).html("Stop recording");
+
+        $(window).keydown(function(event) {
+            if (event.keyCode == 37) {
+                monitor.goBack();
+            }
+            if (event.keyCode == 39) {
+                monitor.goForward();
+            }
+        });
+
+
+    });
+
+
 
 })(jQuery);
