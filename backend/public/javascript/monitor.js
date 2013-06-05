@@ -18,16 +18,19 @@ _.extend(Monitor.prototype, {
     },
 
     init: function() {
-        this.history = [];
-        this.delay = 250;
-        this.messageQueue = new Heap(function(a, b) {
+        this.recording = false;
+        this.historyPosition = 0;
+        var comparator = function(a, b) {
             var res = a.data.time - b.data.time;
             if (0 != res) {
                 return res;
             }
 
             return a.data.counter - b.data.counter;
-        });
+        };
+        this.history = [];
+        this.messageQueue = new Heap(comparator);
+        this.delay = 250;
         this.messageDrawing = false;
         this.canvas = oCanvas.create({ canvas: "#canvas", background: "#222" });
 
@@ -248,11 +251,21 @@ _.extend(Monitor.prototype, {
             this.draw('db');
         }.bind(this));
         socket.on('message', function (data) {
-            this.messageQueue.push(data);
+            if (this.recording) {
+                if (this.history.length > 1000) {
+                    return;
+                }
+                this.history.push(data);
+                this.updateHistoryStatus();
+            } else {
+                this.messageQueue.push(data);
+            }
         }.bind(this));
 
         setInterval(function() {
-            this.drawMessages();
+            if (!this.recording) {
+                this.drawMessages();
+            }
         }.bind(this), 500);
 
     },
@@ -368,7 +381,7 @@ _.extend(Monitor.prototype, {
             start: start,
             end: start,
             stroke: size+"px "+color,
-            shadow: '0 0 10px #000',
+            shadow: '0 0 3px #000',
             cap: "round"
         });
         this.canvas.addChild(line);
@@ -378,16 +391,50 @@ _.extend(Monitor.prototype, {
             duration: 200
         /*   callback: callback*/
         });
-        if (this.delay == 0) {
-            callback();
-        } else {
-            setTimeout(function() {
+        if (!this.recording) {
+            if (this.delay == 0) {
                 callback();
-            }, this.delay);
+            } else {
+                setTimeout(function() {
+                    callback();
+                }, this.delay);
+            }
         }
+
         setTimeout(function() {
             line.fadeOut();
         }, 1000);
+    },
+
+    startRecording: function() {
+        this.recording = true;
+        this.history = [];
+        this.historyPosition = 0;
+
+        this.historyStatus = $('<input type="text">');
+        $('#recording').parent().append(this.historyStatus);
+        this.updateHistoryStatus();
+    },
+    goForward: function() {
+        if (this.historyPosition>=this.history.length) {
+            return;
+        }
+        var message = this.history[this.historyPosition];
+        this.historyPosition++;
+        this.updateHistoryStatus();
+        this.handleMessage(message);
+    },
+    goBack: function() {
+        if (this.historyPosition<=0) {
+            return;
+        }
+        this.historyPosition--;
+        var message = this.history[this.historyPosition];
+        this.updateHistoryStatus();
+        this.handleMessage(message);
+    },
+    updateHistoryStatus: function() {
+        this.historyStatus.val(this.historyPosition+"/"+this.history.length);
     },
 
     random: function (min, max) {
@@ -425,5 +472,24 @@ _.extend(Monitor.prototype, {
         row.append(colorCol).append(text);
         legend.append(row);
     });
+
+    $('#recording').click(function(event) {
+        event.preventDefault();
+        monitor.startRecording();
+        $(this).html("Stop recording");
+
+        $(window).keydown(function(event) {
+            if (event.keyCode == 37) {
+                monitor.goBack();
+            }
+            if (event.keyCode == 39) {
+                monitor.goForward();
+            }
+        });
+
+
+    });
+
+
 
 })(jQuery);
