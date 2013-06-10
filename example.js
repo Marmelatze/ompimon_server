@@ -39,6 +39,11 @@ var client = net.connect({port: 8214}, function() {
             var func = parser.readUInt32();
             client.write(getSendDetail(func));
         }
+        if (action == 0xFE) {
+            var buffer = new BufferBuilder();
+            buffer.appendUInt8(0xFF);
+            client.write(buffer.get());
+        }
         if (action == 0xFF) {
             var buffer = new BufferBuilder();
             buffer.appendUInt8(0xFF);
