@@ -197,7 +197,7 @@ function getSendDetail(func) {
     return buffer.get();
 }
 
-var value = 0;
+var value = 1024;
 var plus = true;
 var max = 1073741824;
 function random() {
