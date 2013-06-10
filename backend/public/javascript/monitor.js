@@ -5,7 +5,6 @@ function Monitor() {
 _.extend(Monitor.prototype, {
 
     colors: {
-        0x00: '#66747B',
         0x01: '#DE6314',
         0x02: '#003366',
         0x03: '#996600',
