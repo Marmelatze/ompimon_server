@@ -27,7 +27,7 @@ var client = net.connect({port: 8214}, function() {
 
                 setInterval(function() {
                     send();
-                }, 5000);
+                }, 500);
 
             }
 
@@ -38,6 +38,17 @@ var client = net.connect({port: 8214}, function() {
         if (action == 5 ) {
             var func = parser.readUInt32();
             client.write(getSendDetail(func));
+        }
+        if (action == 0xFE) {
+            var buffer = new BufferBuilder();
+            buffer.appendUInt8(0xFF);
+            client.write(buffer.get());
+        }
+        if (action == 0xFF) {
+            var buffer = new BufferBuilder();
+            buffer.appendUInt8(0xFF);
+            client.write(buffer.get());
+            process.exit();
         }
     });
 
@@ -192,7 +203,20 @@ function getSendDetail(func) {
     return buffer.get();
 }
 
-
+var value = 0;
+var plus = true;
+var max = 1073741824;
 function random() {
-    return Math.round(Math.random() * 10000);
+    if (plus) {
+        value += Math.round(Math.random() * 1024);
+        if (value > max) {
+            plus = false;
+        }
+    } else {
+        value -= Math.round(Math.random() * 1024);
+        if (value <= 0) {
+            plus = true;
+        }
+    }
+    return value;
 };
