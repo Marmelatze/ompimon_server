@@ -36,7 +36,7 @@ var client = net.connect({port: 8214}, function() {
             client.write(getDataDetail());
         }
         if (action == 5 ) {
-            var func = parser.readUInt32();
+            var func = parser.readUInt8();
             client.write(getSendDetail(func));
         }
         if (action == 0xFE) {
