@@ -206,7 +206,7 @@ var value = 1024;
 var plus = true;
 var max = 1073741824;
 function random() {
-    if (plus) {
+/*    if (plus) {
         value += Math.round(Math.random() * 1024);
         if (value > max) {
             plus = false;
@@ -216,6 +216,6 @@ function random() {
         if (value <= 0) {
             plus = true;
         }
-    }
-    return value;
+    }*/
+    return Math.round(Math.random() * 1024*1024);
 };
