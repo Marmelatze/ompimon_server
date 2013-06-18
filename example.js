@@ -64,11 +64,23 @@ function send() {
     client.write(getData());
 }
 
-var totalRanks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-var ranks = [1, 2, 2, 3, 4, 5, 6];
+var rankCount = 120;
+var nodes = 3;
+
+var totalRanks = [];
+for (var i = 1; i <= rankCount; i++) {
+    totalRanks.push(i);
+}
+
+var perNode = Math.floor(rankCount/nodes);
+
+var ranks = [];
+for (var i = 1; i <= perNode; i++) {
+    ranks.push(i);
+}
 if (instance > 0) {
     ranks = _.map(ranks, function(rank) {
-        return rank+(6*instance);
+        return rank+(perNode*instance);
     });
 }
 console.log(ranks);
@@ -80,7 +92,7 @@ function getInit() {
     data.app = "Dummy node app";
     data.ranks = ranks;
     data.processes = totalRanks.length;
-    data.nodes = 3;
+    data.nodes = nodes;
     data.nodeId = instance;
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x01);
