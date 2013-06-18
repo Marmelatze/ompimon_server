@@ -192,7 +192,7 @@ function getSendDetail(func) {
     });
     var data = {
         sendId: func,
-        data: result
+        ranks: result
     };
 
     var buffer = new BufferBuilder();
