@@ -1,3 +1,8 @@
+/**
+ *
+ * @constructor
+ * @author Florian Pfitzer<pfitzer@w3p.cc>
+ */
 function Monitor() {
     this.init.call(this, arguments);
 };

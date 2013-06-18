@@ -3,6 +3,7 @@
  *
  * @module ompimon
  * @submodule ompimon-backend
+ * @author Florian Pfitzer<pfitzer@w3p.cc>
  */
 
 var express = require('express'),
