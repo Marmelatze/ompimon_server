@@ -4,6 +4,7 @@
  * @submodule ompimon-backend
  * @class User
  * @namespace Ompimon.Backend.User
+ * @author Florian Pfitzer<pfitzer@w3p.cc>
  */
 
 var crypto = require("crypto"),

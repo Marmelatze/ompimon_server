@@ -7,6 +7,15 @@
         "outdir":      "docs",
         "linkNatives": true,
         "tabtospace":  4,
-        "ignorePaths": []
+        "ignorePaths": [],
+        "paths": [
+            "backend",
+            "node_modules/ompimon-client",
+            "node_modules/ompimon-cluster",
+            "node_modules/ompimon-protocol",
+            "node_modules/ompimon-storage",
+            "node_modules/ompimon-auth",
+            "node_modules/ompimon-monitor"
+        ]
     }
 }
