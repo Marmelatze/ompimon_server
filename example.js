@@ -4,6 +4,7 @@ var
     Client = require("ompimon-cluster/client"),
     Parser = require("ompimon-protocol/parser"),
     stub = require("ompimon-protocol/test-stub"),
+    cluser = require("cluster"),
 
     BufferBuilder = require("buffer-builder"),
 
@@ -11,6 +12,11 @@ var
 ;
 
 var instance = process.argv[2] || 0;
+var appId = null;
+if (instance > 0) {
+    appId = process.argv[3];
+}
+
 console.log("starting instance " + instance);
 
 var client = net.connect({port: 8214}, function() {
@@ -23,7 +29,9 @@ var client = net.connect({port: 8214}, function() {
 
         if (action == 1) {
             var status = parser.readUInt8();
+            var appId = parser.readUInt32();
             if (status == 0) {
+                console.log("init success with id "+appId);
 
                 setInterval(function() {
                     send();
@@ -92,6 +100,7 @@ function getInit() {
 
     var data = stub.initData;
     data.app = "Dummy node app";
+    data.appId = appId;
     data.ranks = ranks;
     data.processes = totalRanks.length;
     data.nodes = nodes;
