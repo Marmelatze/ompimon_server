@@ -61,10 +61,12 @@ function sendInit() {
 
 
 function send() {
-    client.write(getData());
+    var data = getData();
+    //console.log(data.length);
+    client.write(data);
 }
 
-var rankCount = 120;
+var rankCount = 99;
 var nodes = 3;
 
 var totalRanks = [];
