@@ -14,7 +14,7 @@ var
 
 
 var rankCount = 18;
-var nodes = 3;
+var nodes = 1;
 
 function Node(id, rankCount, nodes) {
     /**
@@ -283,25 +283,19 @@ _.extend(Node.prototype, {
 
 
 
-var value = 1024;
-var plus = true;
-var max = 1073741824;
+var count = Math.random() * 1024*1024;
 function random() {
-    if (plus) {
-        value += Math.round(Math.random() * 1024 * 1024);
-        if (value > max) {
-            plus = false;
-        }
-    } else {
-        value -= Math.round(Math.random() * 1024 * 1024);
-        if (value <= 0) {
-            plus = true;
-        }
-    }
-    return value;
+    count++;
+    return Math.round(Math.abs(Math.sin(count/(1024*10)) * 1024 * 1024));
     //return Math.round(Math.random() * 1024*1024);
 };
 
+/*
+for (var i = 0; i < 1000; i++) {
+    console.log(random());
+}
+
+process.exit();*/
 
 if (cluster.isMaster) {
     var appId = null;
