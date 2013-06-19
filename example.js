@@ -64,11 +64,23 @@ function send() {
     client.write(getData());
 }
 
+var rankCount = 18;
+var nodes = 3;
 
-var ranks = [1, 2];
+var totalRanks = [];
+for (var i = 1; i <= rankCount; i++) {
+    totalRanks.push(i);
+}
+
+var perNode = Math.floor(rankCount/nodes);
+
+var ranks = [];
+for (var i = 1; i <= perNode; i++) {
+    ranks.push(i);
+}
 if (instance > 0) {
     ranks = _.map(ranks, function(rank) {
-        return rank+(2*instance);
+        return rank+(perNode*instance);
     });
 }
 console.log(ranks);
@@ -79,8 +91,8 @@ function getInit() {
     var data = stub.initData;
     data.app = "Dummy node app";
     data.ranks = ranks;
-    data.processes = 10;
-    data.nodes = 2;
+    data.processes = totalRanks.length;
+    data.nodes = nodes;
     data.nodeId = instance;
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x01);
@@ -92,8 +104,8 @@ function getInit() {
 function getData() {
     var buildData = function(ownRank) {
         var result = [];
-        ranks.forEach(function (rank) {
-            if (rank == ownRank || Math.round(Math.random()) == 1) {
+        totalRanks.forEach(function (rank) {
+            if (rank == ownRank) {
                 return;
             }
 
@@ -118,7 +130,6 @@ function getData() {
             data: buildData(rank)
         })
     });
-
     var buffer = new BufferBuilder();
     buffer.appendUInt8(0x02);
     buffer.appendBuffer(stub.buildSend(data).get());
@@ -134,7 +145,7 @@ function getDataDetail() {
         sends.forEach(function(send) {
             funcs[send] = [];
 
-            ranks.forEach(function(rank) {
+            totalRanks.forEach(function(rank) {
                 if (rank == ownRank) {
                     return;
                 }
@@ -193,7 +204,7 @@ function getSendDetail(func) {
     });
     var data = {
         sendId: func,
-        data: result
+        ranks: result
     };
 
     var buffer = new BufferBuilder();
@@ -203,11 +214,11 @@ function getSendDetail(func) {
     return buffer.get();
 }
 
-var value = 0;
+var value = 1024;
 var plus = true;
 var max = 1073741824;
 function random() {
-    if (plus) {
+/*    if (plus) {
         value += Math.round(Math.random() * 1024);
         if (value > max) {
             plus = false;
@@ -217,6 +228,6 @@ function random() {
         if (value <= 0) {
             plus = true;
         }
-    }
-    return value;
+    }*/
+    return Math.round(Math.random() * 1024*1024);
 };

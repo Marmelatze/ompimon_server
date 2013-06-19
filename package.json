@@ -3,7 +3,8 @@
     "version": "0.0.1",
     "private": true,
     "scripts": {
-        "test": "sh ./test.sh"
+        "test": "sh ./test.sh",
+        "docs": "yuidoc -c yuidoc.json backend/ node_modules/ompimon-*"
     },
     "dependencies": {
         "ompimon-cluster": "*",
