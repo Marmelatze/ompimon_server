@@ -13,7 +13,7 @@ var
 ;
 
 
-var rankCount = 6;
+var rankCount = 120;
 var nodes = 1;
 
 function Node(id, rankCount, nodes, appId) {
@@ -50,7 +50,6 @@ _.extend(Node.prototype, {
     init: function(rankCount, nodes) {
         process.on('message', _.bind(this.handleMessage, this));
 
-
         for (var i = 1; i <= rankCount; i++) {
             this.totalRanks.push(i);
         }
@@ -66,8 +65,11 @@ _.extend(Node.prototype, {
             });
         }
 
-        if (this.id == 0 || this.appId !== null) {
-            this.start();
+        if (this.id == 0 || this.appId != null) {
+            console.log("start");
+            process.nextTick(function() {
+                this.start();
+            }.bind(this));
         }
 
     },
@@ -75,6 +77,7 @@ _.extend(Node.prototype, {
     handleMessage: function(msg) {
         switch(msg.type) {
             case 'init':
+                console.log("init");
                 this.appId = msg.appId;
                 if (!this.started) {
                     this.start();
@@ -113,15 +116,17 @@ _.extend(Node.prototype, {
                     this.appId = appId;
                     console.log("init success with id "+appId);
                     if (this.id == 0) {
-                        process.send({
-                            type: 'init',
-                            appId: appId
+                        process.nextTick(function() {
+                            process.send({
+                                type: 'init',
+                                appId: appId
+                            });
                         });
                     }
 
                     setInterval(function() {
                         this.send();
-                    }.bind(this), 500);
+                    }.bind(this), 1000);
                 }
                 break;
             case 0x03:
@@ -155,6 +160,33 @@ _.extend(Node.prototype, {
     },
     send: function () {
         var data = this.getData();
+        var fs = require("fs");
+        fs.writeFile("send"+(new Date()).getTime()+".bin", data);
+/*
+
+        var Application = require("ompimon-protocol/Application");
+        var socket = new net.Socket();
+        socket.write = function(message) {
+
+        };
+        var client = new Client(socket, 'foo');
+        client.app = new Application(0);
+        client.app.counterFunctions = ['broadcast', 'barrier'];
+        client.app.sendFunctions = [
+            "ibsend",
+            "bsend",
+            "irsend"
+        ];
+        client.ranks = this.ranks;
+
+        var Parser = require("ompimon-protocol/parser");
+        var parser = new Parser(data);
+        parser.readUInt8();
+
+        var action = new (require("ompimon-protocol/cluster_actions/Data"));
+        console.log(action.parse(client, parser));
+        process.exit();*/
+
         this.client.write(data);
     },
 
@@ -332,7 +364,10 @@ if (cluster.isMaster) {
                     fork();
                 } else if (msg.type == 'init') {
                     console.log("update appID", msg.appId);
-                    appId = msg.appId;
+                    _.each(cluster.workers, function(worker) {
+                        worker.send(msg);
+                    });
+                        appId = msg.appId;
                 } else {
                     handleMessage(msg);
                 }
@@ -361,6 +396,10 @@ if (cluster.isMaster) {
 
         this._stdout.write(prefix+" "+util.format.apply(this, arguments) + '\n');
     };
-    console.log(process.env);
-    new Node(instance, rankCount, nodes, process.env.appId);
+
+    var appId = process.env.appId;
+    if (appId == 'null') {
+        appId = null;
+    }
+    new Node(instance, rankCount, nodes, appId);
 };
