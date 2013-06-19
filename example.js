@@ -64,7 +64,7 @@ function send() {
     client.write(getData());
 }
 
-var rankCount = 120;
+var rankCount = 18;
 var nodes = 3;
 
 var totalRanks = [];
