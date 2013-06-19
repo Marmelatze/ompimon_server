@@ -4,7 +4,7 @@ var
     Client = require("ompimon-cluster/client"),
     Parser = require("ompimon-protocol/parser"),
     stub = require("ompimon-protocol/test-stub"),
-    cluser = require("cluster"),
+    cluster = require("cluster"),
 
     BufferBuilder = require("buffer-builder"),
 
@@ -17,7 +17,7 @@ if (instance > 0) {
     appId = process.argv[3];
 }
 
-console.log("starting instance " + instance);
+console.log("starting instance " + instance+ " with app "+ appId);
 
 var client = net.connect({port: 8214}, function() {
     console.log('client connected');
@@ -74,7 +74,7 @@ function send() {
     client.write(data);
 }
 
-var rankCount = 99;
+var rankCount = 18;
 var nodes = 3;
 
 var totalRanks = [];
