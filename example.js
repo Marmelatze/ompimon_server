@@ -13,10 +13,10 @@ var
 ;
 
 
-var rankCount = 18;
+var rankCount = 6;
 var nodes = 1;
 
-function Node(id, rankCount, nodes) {
+function Node(id, rankCount, nodes, appId) {
     /**
      * Instance id
      * @property id
@@ -28,7 +28,7 @@ function Node(id, rankCount, nodes) {
      * @property appId
      * @type Integer|null
      */
-    this.appId = null;
+    this.appId = appId;
 
     /**
      * Whether the client is started
@@ -49,9 +49,7 @@ function Node(id, rankCount, nodes) {
 _.extend(Node.prototype, {
     init: function(rankCount, nodes) {
         process.on('message', _.bind(this.handleMessage, this));
-        if (this.id == 0) {
-            this.start();
-        }
+
 
         for (var i = 1; i <= rankCount; i++) {
             this.totalRanks.push(i);
@@ -67,7 +65,10 @@ _.extend(Node.prototype, {
                 return rank+(perNode*instance);
             });
         }
-        console.log(this.totalRanks, this.ranks);
+
+        if (this.id == 0 || this.appId !== null) {
+            this.start();
+        }
 
     },
 
@@ -79,6 +80,7 @@ _.extend(Node.prototype, {
                     this.start();
                 }
                 break;
+
         }
     },
     start: function() {
@@ -132,7 +134,13 @@ _.extend(Node.prototype, {
             case 0xFE:
                 var buffer = new BufferBuilder();
                 buffer.appendUInt8(0xFF);
-                this.client.write(buffer.get());
+                this.client.write(buffer.get(), function() {
+                   process.exit();
+                });
+                process.send({
+                    type: 'restart'
+                });
+
                 break;
             case 0xFF:
                 var buffer = new BufferBuilder();
@@ -310,10 +318,24 @@ if (cluster.isMaster) {
         // Fork workers.
         for (var i = 0; i < nodes; i++) {
             var proc = cluster.fork({
-                id: i
+                id: i,
+                appId: appId
             });
             proc.on('message', function(msg) {
-                handleMessage(msg);
+                if (msg.type == 'restart') {
+                    _.each(cluster.workers, function(worker) {
+                        if (worker == proc) {
+                            return;
+                        }
+                        worker.kill();
+                    });
+                    fork();
+                } else if (msg.type == 'init') {
+                    console.log("update appID", msg.appId);
+                    appId = msg.appId;
+                } else {
+                    handleMessage(msg);
+                }
             });
         }
     }
@@ -339,5 +361,6 @@ if (cluster.isMaster) {
 
         this._stdout.write(prefix+" "+util.format.apply(this, arguments) + '\n');
     };
-    new Node(instance, rankCount, nodes);
+    console.log(process.env);
+    new Node(instance, rankCount, nodes, process.env.appId);
 };
