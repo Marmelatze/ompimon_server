@@ -71,7 +71,6 @@ _.extend(Node.prototype, {
                 this.start();
             }.bind(this));
         }
-
     },
 
     handleMessage: function(msg) {
@@ -83,7 +82,6 @@ _.extend(Node.prototype, {
                     this.start();
                 }
                 break;
-
         }
     },
     start: function() {
@@ -130,16 +128,16 @@ _.extend(Node.prototype, {
                 }
                 break;
             case 0x03:
-                this.client.write(this.getDataDetail());
+                this.write(this.getDataDetail());
                 break;
             case 0x05:
                 var func = parser.readUInt8();
-                this.client.write(this.getSendDetail(func));
+                this.write(this.getSendDetail(func));
                 break;
             case 0xFE:
                 var buffer = new BufferBuilder();
                 buffer.appendUInt8(0xFF);
-                this.client.write(buffer.get(), function() {
+                this.write(buffer.get(), function() {
                    process.exit();
                 });
                 process.send({
@@ -150,13 +148,13 @@ _.extend(Node.prototype, {
             case 0xFF:
                 var buffer = new BufferBuilder();
                 buffer.appendUInt8(0xFF);
-                this.client.write(buffer.get());
+                this.write(buffer.get());
                 process.exit();
                 break;
         }
     },
     sendInit: function () {
-        this.client.write(this.getInit());
+        this.write(this.getInit());
     },
     send: function () {
         var data = this.getData();
@@ -187,7 +185,14 @@ _.extend(Node.prototype, {
         console.log(action.parse(client, parser));
         process.exit();*/
 
-        this.client.write(data);
+        this.write(data);
+    },
+    write: function (buf) {
+        var buffer = new BufferBuilder();
+        buffer.appendUInt32BE(buf.length);
+        buffer.appendBuffer(buf.length);
+
+        this.client.write(buffer.get());
     },
 
     getInit: function () {
