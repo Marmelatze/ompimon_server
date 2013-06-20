@@ -13,8 +13,8 @@ var
 ;
 
 
-var rankCount = 30;
-var nodes = 1;
+var rankCount = 120;
+var nodes = 8;
 
 function Node(id, rankCount, nodes, appId) {
     /**
@@ -138,18 +138,22 @@ _.extend(Node.prototype, {
                 var buffer = new BufferBuilder();
                 buffer.appendUInt8(0xFF);
                 this.write(buffer.get(), function() {
-                   process.exit();
+                    process.send({
+                        type: 'restart'
+                    });
                 });
-                process.send({
-                    type: 'restart'
-                });
+
 
                 break;
             case 0xFF:
                 var buffer = new BufferBuilder();
                 buffer.appendUInt8(0xFF);
-                this.write(buffer.get());
-                process.exit();
+                this.write(buffer.get(), function() {
+                    process.send({
+                        type: 'abort'
+                    });
+                });
+
                 break;
         }
     },
@@ -158,41 +162,20 @@ _.extend(Node.prototype, {
     },
     send: function () {
         var data = this.getData();
-        var fs = require("fs");
-        fs.writeFile("send"+(new Date()).getTime()+".bin", data);
-/*
-
-        var Application = require("ompimon-protocol/Application");
-        var socket = new net.Socket();
-        socket.write = function(message) {
-
-        };
-        var client = new Client(socket, 'foo');
-        client.app = new Application(0);
-        client.app.counterFunctions = ['broadcast', 'barrier'];
-        client.app.sendFunctions = [
-            "ibsend",
-            "bsend",
-            "irsend"
-        ];
-        client.ranks = this.ranks;
-
-        var Parser = require("ompimon-protocol/parser");
-        var parser = new Parser(data);
-        parser.readUInt8();
-
-        var action = new (require("ompimon-protocol/cluster_actions/Data"));
-        console.log(action.parse(client, parser));
-        process.exit();*/
 
         this.write(data);
     },
-    write: function (buf) {
+    write: function (buf, callback) {
         var buffer = new BufferBuilder();
         buffer.appendUInt32BE(buf.length);
-        buffer.appendBuffer(buf.length);
+        buffer.appendBuffer(buf);
 
-        this.client.write(buffer.get());
+        this.client.write(buffer.get(), null, function() {
+            if (callback) {
+                console.log("callback");
+                callback();
+            }
+        });
     },
 
     getInit: function () {
@@ -203,7 +186,7 @@ _.extend(Node.prototype, {
         data.ranks = this.ranks;
         data.processes = this.totalRanks.length;
         data.nodes = nodes;
-        data.nodeId = instance;
+        data.nodeId = this.id;
         var buffer = new BufferBuilder();
         buffer.appendUInt8(0x01);
         buffer.appendBuffer(stub.buildInit(data).get());
@@ -359,14 +342,13 @@ if (cluster.isMaster) {
                 appId: appId
             });
             proc.on('message', function(msg) {
-                if (msg.type == 'restart') {
+                if (msg.type == 'restart' || msg.type == 'abort') {
                     _.each(cluster.workers, function(worker) {
-                        if (worker == proc) {
-                            return;
-                        }
                         worker.kill();
                     });
-                    fork();
+                    if (msg.type == 'restart') {
+                        fork();
+                    }
                 } else if (msg.type == 'init') {
                     console.log("update appID", msg.appId);
                     _.each(cluster.workers, function(worker) {
@@ -391,7 +373,10 @@ if (cluster.isMaster) {
         color.green,
         color.purple,
         color.red,
-        color.cyan
+        color.cyan,
+        color.black,
+        color.white,
+        color.yellow
     ];
 
     var instance = process.env.id;
