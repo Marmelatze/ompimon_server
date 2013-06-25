@@ -13,8 +13,8 @@ var
 ;
 
 
-var rankCount = 120;
-var nodes = 8;
+var rankCount = 18;
+var nodes = 1;
 
 function Node(id, rankCount, nodes, appId) {
     /**
