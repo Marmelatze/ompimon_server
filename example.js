@@ -13,8 +13,8 @@ var
 ;
 
 
-var rankCount = 30;
-var nodes = 1;
+var rankCount = 16;
+var nodes = 2;
 
 function Node(id, rankCount, nodes, appId) {
     /**
@@ -126,7 +126,7 @@ _.extend(Node.prototype, {
 
                     setInterval(function() {
                         this.send();
-                    }.bind(this), 1000);
+                    }.bind(this), 5000);
                 }
                 break;
             case 0x03:
@@ -161,31 +161,6 @@ _.extend(Node.prototype, {
     send: function () {
         var data = this.getData();
         var fs = require("fs");
-        fs.writeFile("send"+(new Date()).getTime()+".bin", data);
-/*
-
-        var Application = require("ompimon-protocol/Application");
-        var socket = new net.Socket();
-        socket.write = function(message) {
-
-        };
-        var client = new Client(socket, 'foo');
-        client.app = new Application(0);
-        client.app.counterFunctions = ['broadcast', 'barrier'];
-        client.app.sendFunctions = [
-            "ibsend",
-            "bsend",
-            "irsend"
-        ];
-        client.ranks = this.ranks;
-
-        var Parser = require("ompimon-protocol/parser");
-        var parser = new Parser(data);
-        parser.readUInt8();
-
-        var action = new (require("ompimon-protocol/cluster_actions/Data"));
-        console.log(action.parse(client, parser));
-        process.exit();*/
 
         this.client.write(data);
     },
