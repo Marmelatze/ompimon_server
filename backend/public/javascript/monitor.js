@@ -15,6 +15,7 @@ _.extend(Monitor.prototype, {
         0x03: '#996600',
         0x04: '#729FCF',
         0x05: '#64f0ff',
+        0x06: '#8cff9c',
         0x07: '#7259ff',
         0xA0: '#ff3815',
         0xA1: '#a5ff16',
@@ -365,7 +366,10 @@ _.extend(Monitor.prototype, {
             y: to.canvas.abs_y + 10
         };
 
-        var size = 5 + message.size/50;
+        var size = 5 + message.size/100;
+        if (size > 30) {
+            size = 30;
+        }
 
         var padding = size+10;
         if (start.y + from.count*padding > from.canvas.abs_y + from.canvas.height -10) {
@@ -469,15 +473,49 @@ _.extend(Monitor.prototype, {
     });
 
     var legend = $('#legend');
+
+    var clusterAction = {
+        0x01: 'Init',
+        0x02: 'Data',
+        0x03: 'DataDetail',
+        0x04: 'TotalSend',
+        0x05: 'SendDetail',
+        0x06: 'TotalCounter',
+        0xFF: 'Finalize'
+    };
+
+    var clientActions = {
+        0x01: 'Login',
+        0x02: 'Applications',
+        0x03: 'AppDetail',
+        0x04: 'Counter',
+        0x05: 'CounterDetail',
+        0x06: 'Send',
+        0x07: 'SendDetail',
+        0xA0: 'Restart',
+        0xA1: 'Abort',
+        0xFF: 'Sleep'
+    };
+
     _.each(monitor.colors, function(color, action) {
         var row = $('<tr></tr>');
         var colorCol = $('<td></td>').css({backgroundColor: color});
-        var text = $('<td></td>').html(action);
-        row.append(colorCol).append(text);
+        var text = $('<td></td>').html("0x"+parseInt(action).toString(16));
+
+        var cluster = $('<td></td>').html(clusterAction[action]);
+        var client = $('<td></td>').html(clientActions[action]);
+        row.append(colorCol).append(text).append(cluster).append(client);
         legend.append(row);
     });
 
+
+    var recording = false;
+
     $('#recording').click(function(event) {
+        if (recording) {
+            window.location.reload();
+        }
+        recording = true;
         event.preventDefault();
         monitor.startRecording();
         $(this).html("Stop recording");

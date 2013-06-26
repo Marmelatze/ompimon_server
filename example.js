@@ -13,8 +13,8 @@ var
 ;
 
 
-var rankCount = 120;
-var nodes = 8;
+var rankCount = 16;
+var nodes = 2;
 
 function Node(id, rankCount, nodes, appId) {
     /**
@@ -56,7 +56,7 @@ _.extend(Node.prototype, {
 
         var perNode = Math.floor(rankCount/nodes);
 
-        for (var i = 1; i <= perNode; i++) {
+        for (var i = 0; i <= perNode; i++) {
             this.ranks.push(i);
         }
         if (instance > 0) {
@@ -71,6 +71,7 @@ _.extend(Node.prototype, {
                 this.start();
             }.bind(this));
         }
+
     },
 
     handleMessage: function(msg) {
@@ -82,6 +83,7 @@ _.extend(Node.prototype, {
                     this.start();
                 }
                 break;
+
         }
     },
     start: function() {
@@ -124,7 +126,7 @@ _.extend(Node.prototype, {
 
                     setInterval(function() {
                         this.send();
-                    }.bind(this), 1000);
+                    }.bind(this), 5000);
                 }
                 break;
             case 0x03:
