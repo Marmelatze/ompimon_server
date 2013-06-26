@@ -50,7 +50,7 @@ _.extend(Node.prototype, {
     init: function(rankCount, nodes) {
         process.on('message', _.bind(this.handleMessage, this));
 
-        for (var i = 1; i <= rankCount; i++) {
+        for (var i = 0; i <= rankCount-1; i++) {
             this.totalRanks.push(i);
         }
 
