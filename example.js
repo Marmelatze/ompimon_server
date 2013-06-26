@@ -56,7 +56,7 @@ _.extend(Node.prototype, {
 
         var perNode = Math.floor(rankCount/nodes);
 
-        for (var i = 1; i <= perNode; i++) {
+        for (var i = 0; i <= perNode; i++) {
             this.ranks.push(i);
         }
         if (instance > 0) {
