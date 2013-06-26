@@ -56,7 +56,7 @@ _.extend(Node.prototype, {
 
         var perNode = Math.floor(rankCount/nodes);
 
-        for (var i = 0; i <= perNode; i++) {
+        for (var i = 0; i <= perNode-1; i++) {
             this.ranks.push(i);
         }
         if (instance > 0) {
@@ -64,6 +64,8 @@ _.extend(Node.prototype, {
                 return rank+(perNode*instance);
             });
         }
+
+        console.log(this.ranks);
 
         if (this.id == 0 || this.appId != null) {
             console.log("start");
